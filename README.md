@@ -46,13 +46,23 @@ docker compose down
 |---------|-------------|------|
 | api | API Node.js Express | 3000 |
 | db | Base de données PostgreSQL | 5432 |
+| pgadmin | Interface web PostgreSQL | 5050 |
+
+## Accès pgAdmin
+
+- URL : http://localhost:5050
+- Email : harvey@etnair.xyz
+- Password : harvey
 
 ## Structure du projet
 
 ```
 ETNAir/
-├── api/         # Code Node.js
-├── db/          # Fichiers PostgreSQL
+├── api/           # Code Node.js
+│   ├── Dockerfile
+│   ├── server.js
+│   └── package.json
+├── db/            # Fichiers PostgreSQL
 ├── docker-compose.yml
 └── README.md
 ```
