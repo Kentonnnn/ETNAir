@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: etnair_user
+      POSTGRES_PASSWORD: etnair_pass
+      POSTGRES_DB: etnair_db
+    
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    networks:
+      - etnair-network
+  
+  api:
+    build: ./api
+    environment:
+      DB_HOST: db
+      DB_USER: etnair_user
+      DB_PASSWORD: etnair_pass
+      DB_NAME: etnair_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - etnair-network
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: harvey@etnair.xyz
+      PGADMIN_DEFAULT_PASSWORD: harvey
+    ports:
+      - "5050:80"
+    networks:
+      - etnair-network
+    depends_on:
+      - db
+
+networks:
+  etnair-network:
+    driver: bridge
+
+volumes:
+  db_data:
