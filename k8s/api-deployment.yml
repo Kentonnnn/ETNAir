@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: kentonnnn/etnair-api:latest
+        env:
+        - name: DB_HOST
+          value: "postgresql"
+        - name: DB_USER
+          value: "etnair_user"
+        - name: DB_PASSWORD
+          value: "etnair_pass"
+        - name: DB_NAME
+          value: "etnair_db"
+        ports:
+        - containerPort: 3000
