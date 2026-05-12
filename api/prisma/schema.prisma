@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String   @map("first_name") @db.VarChar(100)
+  lastName  String   @map("last_name") @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  password  String   @map("password_hash")
+  role      Role?    @map("user_role")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  listings Listing[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@map("users")
+}
+
+model Listing {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(255)
+  description   String?
+  city          String
+  pricePerNight Decimal   @map("price_per_night") @db.Decimal(10, 2)
+  availableFrom DateTime? @map("available_from") @db.Date
+  availableTo   DateTime? @map("available_to") @db.Date
+  ownerId       Int       @map("owner_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  reviews  Review[]
+  payments Payment[]
+
+  @@map("listings")
+}
+
+model Booking {
+  id         Int           @id @default(autoincrement())
+  startDate  DateTime      @map("start_date") @db.Date
+  endDate    DateTime      @map("end_date") @db.Date
+  totalPrice Decimal       @map("total_price") @db.Decimal(10, 2)
+  status     BookingStatus
+  userId     Int           @map("user_id")
+  listingId  Int           @map("listing_id")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@map("bookings")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int?
+  comment   String?
+  userId    Int?     @map("user_id")
+  listingId Int?     @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Payment {
+  id            Int            @id @default(autoincrement())
+  bookingId     Int            @map("booking_id")
+  amount        Decimal        @db.Decimal(10, 2)
+  paymentMethod String?        @map("payment_method") @db.VarChar(50)
+  paymentStatus PaymentStatus? @map("payment_status")
+  paidAt        DateTime?      @map("paid_at")
+
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  listing   Listing? @relation(fields: [listingId], references: [id])
+  listingId Int?
+
+  @@map("payments")
+}
+
+enum Role {
+  tenant
+  owner
+  admin
+
+  @@map("user_role")
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+}
+
+enum PaymentStatus {
+  on_hold @map("on hold")
+  paid
+  unpaid
+}

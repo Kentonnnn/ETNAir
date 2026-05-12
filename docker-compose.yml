@@ -20,6 +20,9 @@ services:
       DB_USER: etnair_user
       DB_PASSWORD: etnair_pass
       DB_NAME: etnair_db
+      DATABASE_URL: postgresql://etnair_user:etnair_pass@db:5432/etnair_db
+      JWT_SECRET: supersecretkey
+      PORT: 3000
     ports:
       - "3000:3000"
     depends_on:
