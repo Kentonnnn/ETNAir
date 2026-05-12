@@ -36,3 +36,57 @@ router.get('/', userController.getAllUtilisateurs);
 router.get('/:id', userController.getUtilisateur);
 
 export default router;
+
+/**
+ * @swagger
+ * /utilisateurs/{id}:
+ *   put:
+ *     summary: Update user by ID
+ *     tags: [Utilisateurs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 example: user@mail.com
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       404:
+ *         description: User not found
+ */
+router.put('/:id', userController.updateUtilisateur);
+
+/**
+ * @swagger
+ * /utilisateurs/{id}:
+ *   delete:
+ *     summary: Delete user by ID
+ *     tags: [Utilisateurs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       404:
+ *         description: User not found
+ */
+router.delete('/:id', userController.deleteUtilisateur);
