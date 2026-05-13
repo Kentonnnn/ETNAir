@@ -1,7 +1,21 @@
 import { Router } from 'express';
 import * as userController from '../controllers/userController.js';
+import { body, param, validationResult } from 'express-validator'
 
 const router = Router();
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
+
+  next();
+}
 
 /**
  * @swagger
@@ -69,7 +83,37 @@ export default router;
  *       404:
  *         description: User not found
  */
-router.put('/:id', userController.updateUtilisateur);
+router.put(
+    '/:id',
+    [
+      param(id)
+        .isInt()
+        .withMessage("L'identifiant doit être un entier"),
+      
+      body('firstName')
+        .notEmpty()
+        .withMessage('Le prénom ne doit pas être vide')
+        .isLength({ min: 1 })
+        .withMessage('Le prénom doit contenir au moins 1 caractère')
+        .trim(),
+      
+      body('lastName')
+        .notEmpty()
+        .withMessage('Le nom ne doit pas être vide')
+        .isLength({ min: 1 })
+        .withMessage('Le nom doit contenir au moins 1 caractère')
+        .trim(),
+    
+      body('email')
+        .notEmpty()
+        .withMessage("L'email ne doit pas être vide")
+        .isEmail()
+        .withMessage('Email invalide')
+        .normalizeEmail(),
+    ],
+    validate,
+    userController.updateUtilisateur
+);
 
 /**
  * @swagger
@@ -89,4 +133,13 @@ router.put('/:id', userController.updateUtilisateur);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', userController.deleteUtilisateur);
+router.delete(
+    '/:id',
+    [
+      param('id')
+        .isInt()
+        .withMessage("L'identifiant doit être un entier")
+    ],
+    validate,
+    userController.deleteUtilisateur
+);

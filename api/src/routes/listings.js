@@ -1,8 +1,22 @@
 import { Router } from 'express';
 import * as listingController from '../controllers/listingController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { body, param, validationResult } from 'express-validator';
 
 const router = Router();
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
+
+  next();
+};
 
 /**
  * @swagger
@@ -68,7 +82,37 @@ router.get('/:id', listingController.getAnnonce);
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authMiddleware, listingController.createAnnonce);
+router.post(
+  '/',
+  authMiddleware,
+  [
+    body('titre')
+      .notEmpty()
+      .withMessage('Le titre est obligatoire')
+      .isLength({ min: 6 })
+      .withMessage('Le titre doit contenir au moins 6 caractères')
+      .trim(),
+    
+    body('description')
+      .optional()
+      .isLength({ max: 1000 })
+      .withMessage('La description ne doit pas dépasser 1000 caractères'),
+    
+    body('prix')
+      .notEmpty()
+      .withMessage('Le prix est obligatoire')
+      .isFloat({ gt: 0 })
+      .withMessage('Le prix doit être supérieur à 0'),
+    
+    body('localisation')
+      .notEmpty()
+      .withMessage('Veuillez indiquer la localisation de l\'habitation')
+      .isString()
+      .withMessage('La localisation doit être une chaîne de caractères'),
+  ],
+  validate,
+  listingController.createAnnonce
+);
 
 /**
  * @swagger
@@ -109,7 +153,39 @@ router.post('/', authMiddleware, listingController.createAnnonce);
  *       404:
  *         description: Annonce not found
  */
-router.put('/:id', authMiddleware, listingController.updateAnnonce);
+router.put(
+    '/:id', 
+    authMiddleware,
+    [
+      param('id')
+        .isInt()
+        .withMessage("L'identifiant doit être un entier"),
+    
+      body('titre')
+      .optional()
+      .isLength({ min: 6 })
+      .withMessage('Le titre doit contenir au moins 6 caractères'),
+
+      body('description')
+        .optional()
+        .isLength({ max: 1000 })
+        .withMessage(
+          'La description ne doit pas dépasser 1000 caractères'
+        ),
+
+      body('prix')
+        .optional()
+        .isFloat({ gt: 0 })
+        .withMessage('Le prix doit être supérieur à 0'),
+
+      body('localisation')
+        .optional()
+        .isString()
+        .withMessage('La localisation doit être une chaîne de caractères'),
+    ],
+    validate,
+    listingController.updateAnnonce
+);
 
 /**
  * @swagger
@@ -135,6 +211,16 @@ router.put('/:id', authMiddleware, listingController.updateAnnonce);
  *       404:
  *         description: Annonce not found
  */
-router.delete('/:id', authMiddleware, listingController.deleteAnnonce);
+router.delete(
+    '/:id',
+    authMiddleware,
+    [
+      param('id')
+        .inInt()
+        .withMessage("L'identifiant doit être un entier"),
+    ],
+    validate,
+    listingController.deleteAnnonce
+);
 
 export default router;

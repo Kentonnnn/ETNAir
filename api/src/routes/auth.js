@@ -1,7 +1,21 @@
 import { Router } from 'express';
 import * as authController from '../controllers/authController.js';
+import { body, validationResult } from 'express-validator';
 
 const router = Router();
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+    });
+  }
+
+  next();
+}
 
 /**
  * @swagger
@@ -38,7 +52,37 @@ const router = Router();
  *       400:
  *         description: Email already in use
  */
-router.post('/register', authController.register);
+router.post(
+    '/register',
+    [
+      body('email')
+        .isEmail()
+        .withMessage('Email invalide')
+        .normalizeEmail(),
+      
+      body('password')
+        .isLength({ min: 6 })
+        .withMessage('Le mot de passe doit contenir au moins 6 caractères'),
+  
+
+      body('firstName')
+        .notEmpty()
+        .withMessage('Le prénom est obligatoire')
+        .trim(),
+    
+      body('lastName')
+        .notEmpty()
+        .withMessage('Le nom est obligatoire')
+        .trim(),
+    
+      body('role')
+        .optional()
+        .isIn(['tenant', 'owner', 'admin'])
+        .withMessage('Rôle invalide'),
+    ],
+    validate,
+    authController.register
+);
 
 /**
  * @swagger
@@ -66,6 +110,20 @@ router.post('/register', authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authController.login);
+router.post(
+    '/login',
+    [
+      body('email')
+        .isEmail()
+        .withMessage('Email invalide')
+        .normalizeEmail(),
+    
+      body('password')
+        .notEmpty()
+        .withMessage('Le mot de passe est obligatoire'),
+    ],
+    validate,
+    authController.login
+);
 
 export default router;
