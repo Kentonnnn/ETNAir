@@ -24,5 +24,7 @@ spec:
           value: "etnair_pass"
         - name: DB_NAME
           value: "etnair_db"
+        - name: DATABASE_URL
+          value: "postgresql://etnair_user:etnair_pass@postgresql:5432/etnair_db"
         ports:
         - containerPort: 3000
