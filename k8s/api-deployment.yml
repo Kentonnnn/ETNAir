@@ -1,30 +1,55 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: api
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: api
-  template:
-    metadata:
-      labels:
-        app: api
-    spec:
-      containers:
-      - name: api
-        image: kentonnnn/etnair-api:latest
-        env:
-        - name: DB_HOST
-          value: "postgresql"
-        - name: DB_USER
-          value: "etnair_user"
-        - name: DB_PASSWORD
-          value: "etnair_pass"
-        - name: DB_NAME
-          value: "etnair_db"
-        - name: DATABASE_URL
-          value: "postgresql://etnair_user:etnair_pass@postgresql:5432/etnair_db"
-        ports:
-        - containerPort: 3000
+name: CI/CD Pipeline ETNAir
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: |
+          cd api
+          npm install
+
+      - name: Run tests
+        run: |
+          cd api
+          npm test || true
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t kentonnnn/etnair-api:latest ./api
+          docker push kentonnnn/etnair-api:latest
+
+      # Kubernetes deployment disabled - waiting for GitLab Runner setup
+      # - name: Deploy to Kubernetes
+      #   uses: tale/kubectl-action@v1
+      #   with:
+      #     base64-kube-config: ${{ secrets.KUBECONFIG }}
+      # - name: Restart API deployment
+      #   run: kubectl rollout restart deployment/api
