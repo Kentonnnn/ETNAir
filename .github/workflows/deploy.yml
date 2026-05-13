@@ -45,3 +45,11 @@ jobs:
         run: |
           docker build -t kentonnnn/etnair-api:latest ./api
           docker push kentonnnn/etnair-api:latest
+
+      - name: Deploy to Kubernetes
+        uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ secrets.KUBECONFIG }}
+
+      - name: Restart API deployment
+        run: kubectl rollout restart deployment/api
