@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma.js';
 import { hashPassword, comparePassword } from '../utils/hash.js';
 import { generateToken } from '../utils/jwt.js';
-
-const prisma = new PrismaClient();
 
 export const register = async (req, res) => {
   try {

@@ -1,23 +1,21 @@
 import request from 'supertest';
 import app from '../../server.js';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma.js';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 let token;
 let userId;
 
 describe('Routes utilisateurs', () => {
   beforeAll(async () => {
-    await prisma.users.deleteMany({});
+    await prisma.user.deleteMany({});
     
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
-        first_name: 'Admin',
-        last_name: 'User',
+        firstName: 'Admin',
+        lastName: 'User',
         email: 'admin@example.com',
-        password_hash: 'hashed_password',
-        user_role: 'owner',
+        password: 'hashed_password',
+        role: 'owner',
       },
     });
     
@@ -53,24 +51,24 @@ describe('Routes utilisateurs', () => {
         .put(`/utilisateurs/${userId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          first_name: 'Updated',
-          last_name: 'Name',
+          firstName: 'Updated',
+          lastName: 'Name',
         });
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.user.first_name).toBe('Updated');
+      expect(res.body.user.firstName).toBe('Updated');
     });
   });
 
   describe('DELETE /utilisateurs/:id', () => {
     it('devrait supprimer un utilisateur', async () => {
-      const newUser = await prisma.users.create({
+      const newUser = await prisma.user.create({
         data: {
-          first_name: 'Delete',
-          last_name: 'Me',
+          firstName: 'Delete',
+          lastName: 'Me',
           email: 'delete@example.com',
-          password_hash: 'hashed_password',
-          user_role: 'tenant',
+          password: 'hashed_password',
+          role: 'tenant',
         },
       });
 
@@ -80,7 +78,7 @@ describe('Routes utilisateurs', () => {
 
       expect(res.statusCode).toBe(200);
       
-      const deleted = await prisma.users.findUnique({
+      const deleted = await prisma.user.findUnique({
         where: { id: newUser.id },
       });
       expect(deleted).toBeNull();

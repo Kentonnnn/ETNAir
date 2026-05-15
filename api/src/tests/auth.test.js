@@ -1,12 +1,10 @@
 import request from 'supertest';
 import app from '../../server.js';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
 
 describe('Routes d\'authentification', () => {
   beforeAll(async () => {
-    await prisma.users.deleteMany({});
+    await prisma.user.deleteMany({});
   });
 
   afterAll(async () => {
@@ -18,8 +16,8 @@ describe('Routes d\'authentification', () => {
       const res = await request(app)
         .post('/auth/register')
         .send({
-          first_name: 'John',
-          last_name: 'Doe',
+          firstName: 'John',
+          lastName: 'Doe',
           email: 'john@example.com',
           password: 'password123',
         });
@@ -33,8 +31,8 @@ describe('Routes d\'authentification', () => {
       const res = await request(app)
         .post('/auth/register')
         .send({
-          first_name: 'Jane',
-          last_name: 'Doe',
+          firstName: 'Jane',
+          lastName: 'Doe',
           email: 'invalid-email',
           password: 'password123',
         });
@@ -46,8 +44,8 @@ describe('Routes d\'authentification', () => {
       const res = await request(app)
         .post('/auth/register')
         .send({
-          first_name: 'Jane',
-          last_name: 'Doe',
+          firstName: 'Jane',
+          lastName: 'Doe',
           email: 'jane@example.com',
           password: '123',
         });
@@ -61,8 +59,8 @@ describe('Routes d\'authentification', () => {
       await request(app)
         .post('/auth/register')
         .send({
-          first_name: 'Test',
-          last_name: 'User',
+          firstName: 'Test',
+          lastName: 'User',
           email: 'test@example.com',
           password: 'password123',
         });

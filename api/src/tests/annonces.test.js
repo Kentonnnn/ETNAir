@@ -1,40 +1,38 @@
 import request from 'supertest';
 import app from '../../server.js';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma.js';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 let token;
 let userId;
 let listingId;
 
 describe('Routes annonces', () => {
   beforeAll(async () => {
-    await prisma.listings.deleteMany({});
-    await prisma.users.deleteMany({});
+    await prisma.listing.deleteMany({});
+    await prisma.user.deleteMany({});
 
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
-        first_name: 'Owner',
-        last_name: 'User',
+        firstName: 'Owner',
+        lastName: 'User',
         email: 'owner@example.com',
-        password_hash: 'hashed_password',
-        user_role: 'owner',
+        password: 'hashed_password',
+        role: 'owner',
       },
     });
 
     userId = user.id;
     token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const listing = await prisma.listings.create({
+    const listing = await prisma.listing.create({
       data: {
         title: 'Bel appartement à Paris',
         description: 'Spacieux et moderne',
         city: 'Paris',
-        price_per_night: 100,
-        available_from: new Date(),
-        available_to: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        owner_id: userId,
+        pricePerNight: 100,
+        availableFrom: new Date(),
+        availableTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        ownerId: userId,
       },
     });
 
@@ -83,9 +81,9 @@ describe('Routes annonces', () => {
           title: 'Nouvelle annonce',
           description: 'Description',
           city: 'Lyon',
-          price_per_night: 80,
-          available_from: new Date(),
-          available_to: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          pricePerNight: 80,
+          availableFrom: new Date(),
+          availableTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         });
 
       expect(res.statusCode).toBe(201);
@@ -99,7 +97,7 @@ describe('Routes annonces', () => {
           title: 'Nouvelle annonce',
           description: 'Description',
           city: 'Lyon',
-          price_per_night: 80,
+          pricePerNight: 80,
         });
 
       expect(res.statusCode).toBe(401);
@@ -113,7 +111,7 @@ describe('Routes annonces', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           title: 'Annonce mise à jour',
-          price_per_night: 120,
+          pricePerNight: 120,
         });
 
       expect(res.statusCode).toBe(200);
@@ -123,15 +121,15 @@ describe('Routes annonces', () => {
 
   describe('DELETE /annonces/:id', () => {
     it('devrait supprimer une annonce', async () => {
-      const listing = await prisma.listings.create({
+      const listing = await prisma.listing.create({
         data: {
           title: 'À supprimer',
           description: 'Description',
           city: 'Marseille',
-          price_per_night: 90,
-          available_from: new Date(),
-          available_to: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          owner_id: userId,
+          pricePerNight: 90,
+          availableFrom: new Date(),
+          availableTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          ownerId: userId,
         },
       });
 

@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
 
 export const createAnnonce = async (req, res) => {
   try {
@@ -28,7 +26,7 @@ export const createAnnonce = async (req, res) => {
       }
     });
 
-    res.status(201).json(listing);
+    res.status(201).json({ listing });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -36,7 +34,13 @@ export const createAnnonce = async (req, res) => {
 
 export const getAllAnnonces = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const listings = await prisma.listing.findMany({
+      skip,
+      take: limit,
       include: {
         owner: {
           select: { id: true, firstName: true, lastName: true, email: true }
@@ -44,7 +48,8 @@ export const getAllAnnonces = async (req, res) => {
       },
       orderBy: { createdAt: 'desc' }
     });
-    res.json(listings);
+
+    res.json({ listings, page, limit });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -67,7 +72,7 @@ export const getAnnonce = async (req, res) => {
       return res.status(404).json({ error: 'Listing not found' });
     }
 
-    res.json(listing);
+    res.json({ listing });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -108,7 +113,7 @@ export const updateAnnonce = async (req, res) => {
       }
     });
 
-    res.json(updated);
+    res.json({ listing: updated });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
