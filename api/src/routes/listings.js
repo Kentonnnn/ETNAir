@@ -216,7 +216,7 @@ router.delete(
     authMiddleware,
     [
       param('id')
-        .inInt()
+        .isInt()
         .withMessage("L'identifiant doit être un entier"),
     ],
     validate,

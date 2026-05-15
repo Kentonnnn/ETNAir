@@ -86,7 +86,7 @@ export default router;
 router.put(
     '/:id',
     [
-      param(id)
+      param('id')
         .isInt()
         .withMessage("L'identifiant doit être un entier"),
       
