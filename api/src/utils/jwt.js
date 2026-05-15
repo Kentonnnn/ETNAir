@@ -19,11 +19,3 @@ export const verifyToken = (token) => {
     return null;
   }
 };
-
-const jwt = require('jsonwebtoken');
-
-const token = jwt.sign(
-  { userID: utilisateur.id },
-  process.env.JWT_SECRET,
-  { expiresIn: '1h' }
-);

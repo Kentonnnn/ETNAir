@@ -1,4 +1,8 @@
-import 'dotenv/config';
+// Load environment variables only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  import('dotenv/config');
+}
+
 import express from 'express';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -79,7 +83,11 @@ console.log('✓ /health route registered');
 const PORT = process.env.PORT || 3000;
 console.log(`Starting server on port ${PORT}...`);
 
-app.listen(PORT, () => {
-  console.log(`✓ Server running on http://localhost:${PORT}`);
-  console.log(`✓ Swagger documentation at http://localhost:${PORT}/api-docs`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`✓ Server running on http://localhost:${PORT}`);
+    console.log(`✓ Swagger documentation at http://localhost:${PORT}/api-docs`);
+  });
+}
+
+export default app;
