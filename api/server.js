@@ -25,7 +25,10 @@ console.log('Routes imported successfully');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://172.16.248.98'],
+  credentials: true
+}));
 app.use(express.json());
 
 console.log('Middleware configured');
