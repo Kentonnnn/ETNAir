@@ -38,6 +38,11 @@ spec:
             secretKeyRef:
               name: etnair-secrets
               key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: etnair-secrets
+              key: JWT_SECRET
         ports:
         - containerPort: 3000
         resources:
