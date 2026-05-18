@@ -9,7 +9,6 @@ services:
       - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-
     networks:
       - etnair-network
   
@@ -27,6 +26,17 @@ services:
       - "3000:3000"
     depends_on:
       - db
+    networks:
+      - etnair-network
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
     networks:
       - etnair-network
   
