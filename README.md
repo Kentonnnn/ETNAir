@@ -50,7 +50,7 @@ docker compose down
 
 ## Accès pgAdmin
 
-- URL : http://localhost:5050
+- URL : http://172.16.248.98:5050
 - Email : harvey@etnair.xyz
 - Password : harvey
 
