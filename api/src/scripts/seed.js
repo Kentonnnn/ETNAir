@@ -1,15 +1,16 @@
-const { PrismaClient } = require('@prisma/client');
-const { faker } = require('@faker-js/faker');
-const bcrypt = require('bcrypt');
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
+import { faker } from '@faker-js/faker';
+import bcrypt from 'bcrypt';
 
 async function seedDatabase() {
   try {
     console.log('Début du seeding...');
 
-    await prisma.users.deleteMany({});
-    await prisma.listings.deleteMany({});
+    await prisma.booking.deleteMany({});
+    await prisma.review.deleteMany({});
+    await prisma.payment.deleteMany({});
+    await prisma.listing.deleteMany({});
+    await prisma.user.deleteMany({});
 
     const users = [];
 
@@ -17,39 +18,39 @@ async function seedDatabase() {
       const role = i < 5 ? 'owner' : 'tenant';
       const hashedPassword = await bcrypt.hash('password123', 10);
 
-      const user = await prisma.users.create({
+      const user = await prisma.user.create({
         data: {
-          first_name: faker.person.firstName(),
-          last_name: faker.person.lastName(),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          password_hash: hashedPassword,
-          user_role: role,
+          password: hashedPassword,
+          role: role,
         },
       });
 
       users.push(user);
-      console.log(`Utilisateur créé : ${user.first_name} ${user.last_name}`);
+      console.log('Utilisateur créé : ${user.firstName} ${user.lastName}');
     }
 
-    const owners = users.filter(user => user.user_role === 'owner');
+    const owners = users.filter(user => user.role === 'owner');
 
     for (const owner of owners) {
       for (let j = 0; j < 3; j++) {
-        const listing = await prisma.listings.create({
+        const listing = await prisma.listing.create({
           data: {
             title: faker.company.catchPhrase(),
             description: faker.lorem.paragraph(),
             city: faker.location.city(),
-            price_per_night: parseFloat(
+            pricePerNight: parseFloat(
               faker.commerce.price({ min: 40, max: 300 })
             ),
-            available_from: faker.date.soon(),
-            available_to: faker.date.future(),
-            owner_id: owner.id,
+            availableFrom: faker.date.soon(),
+            availableTo: faker.date.future(),
+            ownerId: owner.id,
           },
         });
 
-        console.log(`Annonce créée : ${listing.title}`);
+        console.log('Annonce créée : ${listing.title}');
       }
     }
 
