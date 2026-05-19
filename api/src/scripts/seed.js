@@ -29,7 +29,7 @@ async function seedDatabase() {
       });
 
       users.push(user);
-      console.log('Utilisateur créé : ${user.firstName} ${user.lastName}');
+      console.log(`Utilisateur créé : ${user.firstName} ${user.lastName}`);
     }
 
     const owners = users.filter(user => user.role === 'owner');
@@ -50,7 +50,7 @@ async function seedDatabase() {
           },
         });
 
-        console.log('Annonce créée : ${listing.title}');
+        console.log(`Annonce créée : ${listing.title}`);
       }
     }
 
