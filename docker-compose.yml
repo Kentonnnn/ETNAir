@@ -39,6 +39,9 @@ services:
       - api
     networks:
       - etnair-network
+    volumes:
+    - ./frontend:/app
+    - /app/node_modules
   
   pgadmin:
     image: dpage/pgadmin4
