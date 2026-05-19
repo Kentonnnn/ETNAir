@@ -17,7 +17,6 @@ router.get('/', userController.getAllUtilisateurs);
 
 router.get('/:id', authMiddleware, userController.getUtilisateur);
 
-export default router;
 
 router.put(
   '/:id',
@@ -39,3 +38,4 @@ router.delete(
   validate,
   userController.deleteUtilisateur
 );
+export default router;
