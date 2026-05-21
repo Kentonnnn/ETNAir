@@ -28,6 +28,7 @@ services:
       - db
     networks:
       - etnair-network
+    command: sh -c "npx prisma migrate deploy && node src/scripts/seed.js && node server.js"
 
   frontend:
     build: ./frontend
@@ -39,6 +40,9 @@ services:
       - api
     networks:
       - etnair-network
+    volumes:
+    - ./frontend:/app
+    - /app/node_modules
   
   pgadmin:
     image: dpage/pgadmin4

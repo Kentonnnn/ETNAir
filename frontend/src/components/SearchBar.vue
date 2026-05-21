@@ -2,23 +2,34 @@
   <div class="search-bar">
     <div class="search-field">
       <span class="search-icon">📍</span>
-      <input v-model="form.city" class="search-input" placeholder="Ville (Paris, Lyon...)" @keyup.enter="emit('search', form)" />
+      <input v-model="form.city" class="search-input" placeholder="Ville (Paris, Lyon...)" @keyup.enter="handleSearch()" />
     </div>
     <div class="search-divider"></div>
     <div class="search-field">
       <span class="search-icon">💶</span>
-      <input v-model.number="form.maxPrice" type="number" class="search-input" placeholder="Prix max / nuit" @keyup.enter="emit('search', form)" />
+      <input v-model.number="form.maxPrice" type="number" min="0" class="search-input" placeholder="Prix max / nuit" @keyup.enter="handleSearch()" />
     </div>
-    <button class="search-btn" @click="emit('search', form)">
+    <button class="search-btn" @click="handleSearch()">
       <span>Rechercher</span> 🔍
     </button>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 const emit = defineEmits(['search'])
 const form = reactive({ city: '', maxPrice: null })
+
+watch(() => form.maxPrice, (value) => {
+  if (value !== null && value < 0) {
+    form.maxPrice = 0
+  }
+})
+
+function handleSearch() {
+  if (form.maxPrice !== null && form.maxPrice < 0) form.maxPrice = 0
+  emit('search', form)
+}
 </script>
 
 <style scoped>

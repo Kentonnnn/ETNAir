@@ -22,7 +22,7 @@
 
           <div class="filter-group">
             <label class="filter-label">Prix max / nuit</label>
-            <input v-model.number="filters.maxPrice" type="number" class="form-input" placeholder="Illimité" @input="applyFilters(filters)" />
+            <input v-model.number="filters.maxPrice" type="number" min="0" class="form-input" placeholder="Illimité" @input="applyFilters(filters)" />
           </div>
 
           <div class="filter-group">
@@ -139,7 +139,7 @@ function resetFilters() {
 onMounted(async () => {
   try {
     const { data } = await listingService.getAll()
-    allListings.value = data
+    allListings.value = data.listings ?? data
   } catch (e) {
     error.value = 'Impossible de charger les annonces. Vérifiez que l\'API est démarrée.'
   } finally { loading.value = false }

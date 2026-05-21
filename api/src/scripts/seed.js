@@ -1,51 +1,73 @@
-const { PrismaClient } = require('@prisma/client');
-const { faker } = require('@faker-js/faker');
-const bcrypt = require('bcrypt');
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
+import { faker } from '@faker-js/faker';
+import bcrypt from 'bcrypt';
 
 async function seedDatabase() {
   try {
-    console.log('Début du seeding...');
+    // Vérifie si le seed a déjà été lancé
+    const seedUser = await prisma.user.findFirst({
+      where: { email: 'seed@etnair.com' }
+    });
 
-    await prisma.users.deleteMany({});
-    await prisma.listings.deleteMany({});
+    if (seedUser) {
+      console.log('Base déjà peuplée, seed ignoré.');
+      await prisma.$disconnect();
+      return;
+    }
+
+    console.log('Début du seeding...');
 
     const users = [];
 
+    // Utilisateur sentinelle fixe pour détecter si le seed a déjà tourné
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    const sentinel = await prisma.user.create({
+      data: {
+        firstName: 'Seed',
+        lastName: 'ETNAir',
+        email: 'seed@etnair.com',
+        password: hashedPassword,
+        role: 'owner',
+      },
+    });
+    users.push(sentinel);
+    console.log('Utilisateur sentinelle créé : seed@etnair.com');
+
+    // 10 utilisateurs Faker (5 owners + 5 tenants)
     for (let i = 0; i < 10; i++) {
       const role = i < 5 ? 'owner' : 'tenant';
-      const hashedPassword = await bcrypt.hash('password123', 10);
+      const hashedPwd = await bcrypt.hash('password123', 10);
 
-      const user = await prisma.users.create({
+      const user = await prisma.user.create({
         data: {
-          first_name: faker.person.firstName(),
-          last_name: faker.person.lastName(),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          password_hash: hashedPassword,
-          user_role: role,
+          password: hashedPwd,
+          role: role,
         },
       });
 
       users.push(user);
-      console.log(`Utilisateur créé : ${user.first_name} ${user.last_name}`);
+      console.log(`Utilisateur créé : ${user.firstName} ${user.lastName}`);
     }
 
-    const owners = users.filter(user => user.user_role === 'owner');
+    // 3 annonces par owner
+    const owners = users.filter(user => user.role === 'owner');
 
     for (const owner of owners) {
       for (let j = 0; j < 3; j++) {
-        const listing = await prisma.listings.create({
+        const listing = await prisma.listing.create({
           data: {
             title: faker.company.catchPhrase(),
             description: faker.lorem.paragraph(),
             city: faker.location.city(),
-            price_per_night: parseFloat(
+            pricePerNight: parseFloat(
               faker.commerce.price({ min: 40, max: 300 })
             ),
-            available_from: faker.date.soon(),
-            available_to: faker.date.future(),
-            owner_id: owner.id,
+            availableFrom: faker.date.soon(),
+            availableTo: faker.date.future(),
+            ownerId: owner.id,
           },
         });
 

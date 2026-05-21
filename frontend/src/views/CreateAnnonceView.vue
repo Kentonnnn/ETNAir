@@ -37,7 +37,7 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Prix / nuit (€) *</label>
-                <input v-model.number="form.pricePerNight" type="number" min="0" step="0.01" class="form-input" placeholder="35.00" required />
+               <input v-model.number="form.pricePerNight" type="number" min="1" step="0.01" class="form-input" placeholder="35.00" required />
               </div>
             </div>
           </div>

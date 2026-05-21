@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
-    "seed": "node scripts/seed.js"
+    "seed": "node api/src/scripts/seed.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Kentonnnn/ETNAir#readme",
   "dependencies": {
+    "@faker-js/faker": "^9.0.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@prisma/config": "^7.8.0",
