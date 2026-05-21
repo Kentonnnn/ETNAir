@@ -1,0 +1,32 @@
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  image: node:24-alpine
+  only:
+    - main
+    - develop
+  script:
+    - cd api
+    - npm install
+    - npm test || true
+
+deploy:
+  stage: deploy
+  image: docker:24
+  only:
+    - main
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  script:
+    - docker build -t kentonnnn/etnair-api:latest ./api
+    - docker push kentonnnn/etnair-api:latest
+    - docker build -t kentonnnn/etnair-frontend:latest ./frontend
+    - docker push kentonnnn/etnair-frontend:latest
+    - kubectl apply -f k8s/
+  after_script:
+    - docker logout
