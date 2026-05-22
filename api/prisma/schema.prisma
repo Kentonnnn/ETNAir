@@ -29,6 +29,8 @@ model Listing {
   description   String?
   city          String
   pricePerNight Decimal   @map("price_per_night") @db.Decimal(10, 2)
+  latitude      Float?
+  longitude     Float?
   availableFrom DateTime? @map("available_from") @db.Date
   availableTo   DateTime? @map("available_to") @db.Date
   ownerId       Int       @map("owner_id")
