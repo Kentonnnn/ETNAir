@@ -201,7 +201,7 @@ async function handleDelete() {
 onMounted(async () => {
   try {
     const { data } = await listingService.getOne(route.params.id)
-    listing.value = data
+    listing.value = data.listing
   } catch { /* 404 */ }
   finally { loading.value = false }
 })

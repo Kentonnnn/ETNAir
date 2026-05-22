@@ -52,16 +52,35 @@ async function seedDatabase() {
       console.log(`Utilisateur créé : ${user.firstName} ${user.lastName}`);
     }
 
+    const CITIES = [
+      { name: 'Paris',       lat: 48.8566, lng: 2.3522 },
+      { name: 'Lyon',        lat: 45.7640, lng: 4.8357 },
+      { name: 'Marseille',   lat: 43.2965, lng: 5.3698 },
+      { name: 'Bordeaux',    lat: 44.8378, lng: -0.5792 },
+      { name: 'Toulouse',    lat: 43.6047, lng: 1.4442 },
+      { name: 'Nice',        lat: 43.7102, lng: 7.2620 },
+      { name: 'Nantes',      lat: 47.2184, lng: -1.5536 },
+      { name: 'Strasbourg',  lat: 48.5734, lng: 7.7521 },
+      { name: 'Montpellier', lat: 43.6110, lng: 3.8767 },
+      { name: 'Lille',       lat: 50.6292, lng: 3.0573 },
+      { name: 'Rennes',      lat: 48.1173, lng: -1.6778 },
+      { name: 'Grenoble',    lat: 45.1885, lng: 5.7245 },
+    ];
+
     // 3 annonces par owner
     const owners = users.filter(user => user.role === 'owner');
 
     for (const owner of owners) {
       for (let j = 0; j < 3; j++) {
+        const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+        const jitter = () => (Math.random() - 0.5) * 0.08;
         const listing = await prisma.listing.create({
           data: {
             title: faker.company.catchPhrase(),
             description: faker.lorem.paragraph(),
-            city: faker.location.city(),
+            city: city.name,
+            latitude: city.lat + jitter(),
+            longitude: city.lng + jitter(),
             pricePerNight: parseFloat(
               faker.commerce.price({ min: 40, max: 300 })
             ),
@@ -71,7 +90,7 @@ async function seedDatabase() {
           },
         });
 
-        console.log(`Annonce créée : ${listing.title}`);
+        console.log(`Annonce créée : ${listing.title} (${city.name})`);
       }
     }
 

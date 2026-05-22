@@ -55,8 +55,9 @@
             <span v-if="filters.city"> à {{ filters.city }}</span>
           </span>
           <div class="view-toggle">
-            <button :class="['view-btn', { active: viewMode === 'grid' }]" @click="viewMode = 'grid'">⊞</button>
-            <button :class="['view-btn', { active: viewMode === 'list' }]" @click="viewMode = 'list'">☰</button>
+            <button :class="['view-btn', { active: viewMode === 'grid' }]" @click="viewMode = 'grid'" title="Grille">⊞</button>
+            <button :class="['view-btn', { active: viewMode === 'list' }]" @click="viewMode = 'list'" title="Liste">☰</button>
+            <button :class="['view-btn', { active: viewMode === 'map' }]" @click="viewMode = 'map'" title="Carte">🗺</button>
           </div>
         </div>
 
@@ -65,6 +66,9 @@
 
         <!-- Error -->
         <div v-else-if="error" class="alert alert-error">{{ error }}</div>
+
+        <!-- Map view -->
+        <MapView v-else-if="viewMode === 'map'" :listings="filtered" />
 
         <!-- Empty -->
         <div v-else-if="filtered.length === 0" class="empty">
@@ -80,7 +84,7 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination" v-if="totalPages > 1">
+        <div class="pagination" v-if="totalPages > 1 && viewMode !== 'map'">
           <button class="page-btn" :disabled="page <= 1" @click="page--">← Précédent</button>
           <div class="page-nums">
             <button v-for="p in totalPages" :key="p" :class="['page-num', { active: page === p }]" @click="page = p">{{ p }}</button>
@@ -99,6 +103,7 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import MapView from '@/components/MapView.vue'
 
 const route = useRoute()
 const auth = useAuthStore()
