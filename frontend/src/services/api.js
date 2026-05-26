@@ -36,7 +36,11 @@ export const authService = {
 export const listingService = {
   getAll: (params = {}) => api.get('/annonces', { params }),
   getOne: (id) => api.get(`/annonces/${id}`),
-  create: (data) => api.post('/annonces', data),
+  create: (data) => api.post('/annonces', data, {
+  headers: data instanceof FormData
+    ? { 'Content-Type': 'multipart/form-data' }
+    : { 'Content-Type': 'application/json' }
+}),
   update: (id, data) => api.put(`/annonces/${id}`, data),
   remove: (id) => api.delete(`/annonces/${id}`),
 }
