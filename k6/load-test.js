@@ -15,10 +15,10 @@ export const options = {
 };
 
 export default function () {
-  const health = http.get('https://172.16.248.98/api/health');
-  check(health, {
-    'API health status 200': (r) => r.status === 200,
-    'API health time < 500ms': (r) => r.timings.duration < 500,
+  const home = http.get('https://172.16.248.98/');
+  check(home, {
+    'Frontend status 200': (r) => r.status === 200,
+    'Frontend time < 500ms': (r) => r.timings.duration < 500,
   });
 
   sleep(1);
