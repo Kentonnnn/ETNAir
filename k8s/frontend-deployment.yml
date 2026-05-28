@@ -17,6 +17,6 @@ spec:
         image: kentonnnn/etnair-frontend:latest
         env:
         - name: VITE_API_URL
-          value: "http://172.16.248.98/api"
+          value: "https://172.16.248.98/api"
         ports:
         - containerPort: 5173
