@@ -8,6 +8,10 @@ test:
   only:
     - main
     - develop
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - api/node_modules/
   script:
     - cd api
     - npm install
