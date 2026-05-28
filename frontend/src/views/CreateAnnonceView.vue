@@ -103,7 +103,7 @@
           <h3 class="preview-title">Aperçu de votre annonce</h3>
           <div class="preview-card">
             <div class="preview-img">
-              <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=220&fit=crop" alt="preview" />
+              <img :src="previews[0] || placeholderImage" alt="preview" />
               <span class="badge badge-success preview-badge">Disponible</span>
             </div>
             <div class="preview-body">
@@ -112,6 +112,12 @@
               <div class="preview-desc" v-if="form.description">{{ truncate(form.description, 80) }}</div>
               <div class="preview-price">
                 <strong>{{ form.pricePerNight || '—' }} €</strong> /nuit
+              </div>
+              <div v-if="previews.length" class="preview-image-list">
+                <h4>Photos ajoutées</h4>
+                <div class="preview-image-thumbs">
+                  <img v-for="(src, index) in previews.slice(0, 4)" :key="index" :src="src" alt="photo preview" />
+                </div>
               </div>
             </div>
           </div>
@@ -148,6 +154,7 @@ const form = reactive({ title: '', description: '', city: '', pricePerNight: '',
 const fileInput = ref(null)
 const imageFiles = ref([])
 const previews = ref([])
+const placeholderImage = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=220&fit=crop'
 
 function onFileChange(e) {
   addImages(Array.from(e.target.files))
@@ -227,6 +234,10 @@ textarea.form-input { resize: vertical; font-family: var(--font); }
 .preview-desc { font-size: .85rem; color: var(--text-muted); margin-bottom: 8px; }
 .preview-price { font-size: .9rem; color: var(--text-muted); }
 .preview-price strong { color: var(--primary); font-size: 1.2rem; }
+.preview-image-list { margin-top: 18px; }
+.preview-image-list h4 { font-size: .9rem; color: var(--text); margin-bottom: 10px; }
+.preview-image-thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.preview-image-thumbs img { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
 .tips { background: var(--primary-light); border-radius: var(--radius); padding: 20px; }
 .tips h4 { font-size: .95rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
 .tips ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
