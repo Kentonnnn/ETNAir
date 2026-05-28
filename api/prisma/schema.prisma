@@ -16,9 +16,10 @@ model User {
   role      Role?    @map("user_role")
   createdAt DateTime @default(now()) @map("created_at")
 
-  listings Listing[]
-  bookings Booking[]
-  reviews  Review[]
+  listings  Listing[]
+  bookings  Booking[]
+  reviews   Review[]
+  favorites Favorite[]
 
   @@map("users")
 }
@@ -36,12 +37,38 @@ model Listing {
   ownerId       Int       @map("owner_id")
   createdAt     DateTime  @default(now()) @map("created_at")
 
-  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  bookings Booking[]
-  reviews  Review[]
-  payments Payment[]
+  owner     User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+  reviews   Review[]
+  images    ListingImage[]
+  payments  Payment[]
+  favorites Favorite[]
 
   @@map("listings")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  listingId Int      @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+model ListingImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  key       String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId Int      @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("listing_images")
 }
 
 model Booking {

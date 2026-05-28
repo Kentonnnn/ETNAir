@@ -8,7 +8,9 @@ const routes = [
   { path: '/login',        name: 'Login',        component: () => import('@/views/LoginView.vue'),        meta: { guest: true } },
   { path: '/register',     name: 'Register',     component: () => import('@/views/RegisterView.vue'),     meta: { guest: true } },
   { path: '/dashboard',    name: 'Dashboard',    component: () => import('@/views/DashboardView.vue'),    meta: { auth: true } },
+  { path: '/favoris',      name: 'Favorites',    component: () => import('@/views/FavoritesView.vue'),    meta: { auth: true } },
   { path: '/annonces/create', name: 'CreateAnnonce', component: () => import('@/views/CreateAnnonceView.vue'), meta: { auth: true } },
+  { path: '/annonces/:id/edit', name: 'EditAnnonce',   component: () => import('@/views/EditAnnonceView.vue'),   meta: { auth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 

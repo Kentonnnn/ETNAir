@@ -1,11 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const fs = require('fs');
-const path = require('path');
-const verifyToken = require('../middleware/auth');
+import express from 'express';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { authMiddleware } from '../middleware/auth.js';
 
-// Configuration MinIO (S3 compatible)
+const router = express.Router();
+
 const s3Client = new S3Client({
   region: 'us-east-1',
   endpoint: process.env.MINIO_URL || 'http://localhost:9000',
@@ -18,51 +16,36 @@ const s3Client = new S3Client({
 
 const BUCKET_NAME = process.env.MINIO_BUCKET || 'listings';
 
-// Upload image
-router.post('/upload', verifyToken, async (req, res) => {
+router.post('/upload', authMiddleware, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Aucun fichier fourni' });
     }
 
-    const fileContent = fs.readFileSync(req.file.path);
     const key = `listings/${Date.now()}-${req.file.originalname}`;
-
     const params = {
       Bucket: BUCKET_NAME,
       Key: key,
-      Body: fileContent,
+      Body: req.file.buffer,
       ContentType: req.file.mimetype,
     };
 
     await s3Client.send(new PutObjectCommand(params));
-    
-    // Supprimer le fichier local
-    fs.unlinkSync(req.file.path);
 
     const imageUrl = `${process.env.MINIO_URL}/${BUCKET_NAME}/${key}`;
-
-    res.status(200).json({
-      message: 'Image uploadée avec succès',
-      imageUrl: imageUrl,
-      key: key,
-    });
+    res.status(200).json({ message: 'Image uploadée avec succès', imageUrl, key });
   } catch (error) {
     console.error('Erreur upload:', error);
     res.status(500).json({ message: 'Erreur lors de l\'upload' });
   }
 });
 
-// Delete image
-router.delete('/:imageKey', verifyToken, async (req, res) => {
+router.delete('/:imageKey', authMiddleware, async (req, res) => {
   try {
-    const params = {
+    await s3Client.send(new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: req.params.imageKey,
-    };
-
-    await s3Client.send(new DeleteObjectCommand(params));
-
+    }));
     res.status(200).json({ message: 'Image supprimée avec succès' });
   } catch (error) {
     console.error('Erreur suppression:', error);
@@ -70,4 +53,4 @@ router.delete('/:imageKey', verifyToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

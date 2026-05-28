@@ -1,6 +1,7 @@
 import { verifyToken } from '../utils/jwt.js';
+import { prisma } from '../lib/prisma.js';
 
-export const authMiddleware = (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -14,6 +15,12 @@ export const authMiddleware = (req, res, next) => {
     return;
   }
 
-  req.userId = decoded.userId;
+  const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+  if (!user) {
+    res.status(401).json({ error: 'Utilisateur introuvable' });
+    return;
+  }
+
+  req.userId = user.id;
   next();
 };

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as listingController from '../controllers/listingController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 import { body, param, validationResult } from 'express-validator';
 
 const router = Router();
@@ -20,6 +21,7 @@ router.get('/:id', listingController.getAnnonce);
 router.post(
   '/',
   authMiddleware,
+  upload.array('images', 5),
   [
     body('title').notEmpty().withMessage('Le titre est obligatoire').trim(),
     body('description').optional().isLength({ max: 1000 }),
@@ -33,6 +35,7 @@ router.post(
 router.put(
   '/:id',
   authMiddleware,
+  upload.array('images', 5),
   [
     param('id').isInt().withMessage("L'identifiant doit être un entier"),
     body('title').optional().trim(),
