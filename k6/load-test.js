@@ -15,18 +15,18 @@ export const options = {
 };
 
 export default function () {
-  const home = http.get('https://172.16.248.98/');
-  check(home, {
+  const frontend = http.get('https://172.16.248.98/');
+  check(frontend, {
     'Frontend status 200': (r) => r.status === 200,
     'Frontend time < 500ms': (r) => r.timings.duration < 500,
   });
 
   sleep(1);
 
-  const annonces = http.get('https://172.16.248.98/api/listings');
+  const annonces = http.get('https://172.16.248.98/api/annonces');
   check(annonces, {
-    'Listings status 200': (r) => r.status === 200,
-    'Listings time < 1000ms': (r) => r.timings.duration < 1000,
+    'Annonces status 200': (r) => r.status === 200,
+    'Annonces time < 1000ms': (r) => r.timings.duration < 1000,
   });
 
   sleep(1);
