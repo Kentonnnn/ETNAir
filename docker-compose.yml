@@ -26,9 +26,9 @@ services:
       - "3000:3000"
     depends_on:
       - db
+    restart: unless-stopped
     networks:
       - etnair-network
-    command: sh -c "npx prisma migrate deploy && node src/scripts/seed.js && node server.js"
 
   frontend:
     build: ./frontend
