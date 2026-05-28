@@ -39,9 +39,21 @@ model Listing {
   owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   bookings Booking[]
   reviews  Review[]
+  images   ListingImage[]
   payments Payment[]
 
   @@map("listings")
+}
+
+model ListingImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  key       String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId Int      @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("listing_images")
 }
 
 model Booking {
