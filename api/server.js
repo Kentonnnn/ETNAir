@@ -5,8 +5,13 @@ if (process.env.NODE_ENV !== 'test') {
 
 import express from 'express';
 import cors from 'cors';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import imageRoutes from './src/routes/images.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('Starting server...');
 console.log('Environment:', {
@@ -19,6 +24,7 @@ console.log('Environment:', {
 import authRoutes from './src/routes/auth.js';
 import userRoutes from './src/routes/utilisateurs.js';
 import listingRoutes from './src/routes/listings.js';
+import favoriteRoutes from './src/routes/favorites.js';
 
 console.log('Routes imported successfully');
 
@@ -26,10 +32,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://172.16.248.98'],
+  origin: ['http://localhost:5173', 'http://172.16.248.98', 'https://172.16.248.98'],
   credentials: true
 }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 console.log('Middleware configured');
 
@@ -76,6 +83,12 @@ console.log('✓ /utilisateurs routes registered');
 
 app.use('/annonces', listingRoutes);
 console.log('✓ /annonces routes registered');
+
+app.use('/images', imageRoutes);
+console.log('✓ /images routes registered');
+
+app.use('/favoris', favoriteRoutes);
+console.log('✓ /favoris routes registered');
 
 // Health check
 app.get('/health', (req, res) => {

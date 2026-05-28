@@ -137,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject } from 'vue'
+import { ref, reactive, inject, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { listingService } from '@/services/api'
 
@@ -193,7 +193,7 @@ async function handleSubmit() {
     Object.entries(form).forEach(([key, val]) => {
       if (val !== '') payload.append(key, val)
     })
-    imageFiles.value.forEach(file => payload.append('images', file))
+    imageFiles.value.forEach(file => payload.append('images', toRaw(file)))
     if (!payload.availableFrom) delete payload.availableFrom
     if (!payload.availableTo) delete payload.availableTo
     await listingService.create(payload)

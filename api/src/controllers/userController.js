@@ -30,7 +30,7 @@ export const getUtilisateur = async (req, res) => {
         lastName: true,
         role: true,
         createdAt: true,
-        listings: true
+        listings: { include: { images: true } }
       }
     });
 

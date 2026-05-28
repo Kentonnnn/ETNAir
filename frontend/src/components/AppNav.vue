@@ -17,6 +17,7 @@
       <!-- CTA area -->
       <div class="nav-cta">
         <template v-if="auth.isLoggedIn">
+          <RouterLink to="/favoris" class="nav-link fav-link">♥ Favoris</RouterLink>
           <RouterLink to="/dashboard" class="nav-user">
             <div class="user-avatar">{{ initials }}</div>
             <span class="user-name">{{ auth.user?.firstName }}</span>
@@ -41,6 +42,7 @@
         <RouterLink to="/annonces" class="mobile-link" @click="menuOpen=false">Nos logements</RouterLink>
         <RouterLink to="/login" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Connexion</RouterLink>
         <RouterLink to="/register" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Inscription</RouterLink>
+        <RouterLink to="/favoris" class="mobile-link" @click="menuOpen=false" v-if="auth.isLoggedIn">♥ Mes favoris</RouterLink>
         <RouterLink to="/dashboard" class="mobile-link" @click="menuOpen=false" v-if="auth.isLoggedIn">Mon espace</RouterLink>
         <button class="mobile-link" @click="handleLogout" v-if="auth.isLoggedIn">Déconnexion</button>
       </div>
@@ -98,6 +100,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .nav-link { padding: 8px 14px; border-radius: 8px; font-size: .9rem; font-weight: 500; color: var(--text-muted); transition: all var(--transition); cursor: pointer; background: none; border: none; }
 .nav-link:hover, .nav-link.router-link-active { color: var(--primary); background: var(--primary-light); }
 .nav-login { color: var(--text); }
+.fav-link { color: #e74c3c !important; }
 .nav-cta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .nav-user { display: flex; align-items: center; gap: 8px; text-decoration: none; }
 .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; }

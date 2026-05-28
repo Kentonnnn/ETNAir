@@ -1,34 +1,7 @@
 import { prisma } from '../lib/prisma.js';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-
-const s3Client = new S3Client({
-  region: 'us-east-1',
-  endpoint: process.env.MINIO_URL || 'http://localhost:9000',
-  credentials: {
-    accessKeyId: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    secretAccessKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-  },
-  forcePathStyle: true,
-});
-
-const BUCKET_NAME = process.env.MINIO_BUCKET || 'listings';
-
-const uploadToMinio = async (file) => {
-  const key = `listings/${Date.now()}-${file.originalname}`;
-  const params = {
-    Bucket: BUCKET_NAME,
-    Key: key,
-    Body: file.buffer,
-    ContentType: file.mimetype,
-  };
-  await s3Client.send(new PutObjectCommand(params));
-  return {
-    url: `${process.env.MINIO_URL}/${BUCKET_NAME}/${key}`,
-    key,
-  };
-};
 
 export const createAnnonce = async (req, res) => {
+  console.log('[createAnnonce] files:', req.files?.length ?? 0, '| content-type:', req.headers['content-type']?.slice(0, 50), '| images in body:', req.body.images);
   try {
     const { title, description, city, pricePerNight, availableFrom, availableTo } = req.body;
     const ownerId = req.userId;
@@ -54,11 +27,11 @@ export const createAnnonce = async (req, res) => {
     });
 
     if (req.files && req.files.length > 0) {
-      const imageData = [];
-      for (const file of req.files) {
-        const uploaded = await uploadToMinio(file);
-        imageData.push({ url: uploaded.url, key: uploaded.key, listingId: listing.id });
-      }
+      const imageData = req.files.map(file => ({
+        url: `/uploads/${file.filename}`,
+        key: file.filename,
+        listingId: listing.id,
+      }));
       await prisma.listingImage.createMany({ data: imageData });
     }
 
@@ -91,7 +64,8 @@ export const getAllAnnonces = async (req, res) => {
       include: {
         owner: {
           select: { id: true, firstName: true, lastName: true, email: true }
-        }
+        },
+        images: true
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -111,6 +85,7 @@ export const getAnnonce = async (req, res) => {
         owner: {
           select: { id: true, firstName: true, lastName: true, email: true }
         },
+        images: true,
         reviews: true
       }
     });
@@ -129,35 +104,46 @@ export const updateAnnonce = async (req, res) => {
   try {
     const { id } = req.params;
     const ownerId = req.userId;
-    const { title, description, city, pricePerNight, availableFrom, availableTo } = req.body;
+    const { title, description, city, pricePerNight, availableFrom, availableTo, removeImageIds } = req.body;
 
     const listing = await prisma.listing.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: parseInt(id) },
+      include: { images: true },
     });
 
-    if (!listing) {
-      return res.status(404).json({ error: 'Listing not found' });
+    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+    if (listing.ownerId !== ownerId) return res.status(403).json({ error: 'Forbidden' });
+
+    if (removeImageIds) {
+      const ids = String(removeImageIds).split(',').map(Number).filter(Boolean);
+      if (ids.length) {
+        await prisma.listingImage.deleteMany({ where: { id: { in: ids }, listingId: parseInt(id) } });
+      }
     }
 
-    if (listing.ownerId !== ownerId) {
-      return res.status(403).json({ error: 'Forbidden' });
+    if (req.files && req.files.length > 0) {
+      const imageData = req.files.map(file => ({
+        url: `/uploads/${file.filename}`,
+        key: file.filename,
+        listingId: parseInt(id),
+      }));
+      await prisma.listingImage.createMany({ data: imageData });
     }
 
     const updated = await prisma.listing.update({
       where: { id: parseInt(id) },
       data: {
         title: title || listing.title,
-        description: description || listing.description,
+        description: description !== undefined ? description : listing.description,
         city: city || listing.city,
         pricePerNight: pricePerNight ? parseFloat(pricePerNight) : listing.pricePerNight,
         availableFrom: availableFrom ? new Date(availableFrom) : listing.availableFrom,
-        availableTo: availableTo ? new Date(availableTo) : listing.availableTo
+        availableTo: availableTo ? new Date(availableTo) : listing.availableTo,
       },
       include: {
-        owner: {
-          select: { id: true, firstName: true, lastName: true, email: true }
-        }
-      }
+        owner: { select: { id: true, firstName: true, lastName: true, email: true } },
+        images: true,
+      },
     });
 
     res.json({ listing: updated });

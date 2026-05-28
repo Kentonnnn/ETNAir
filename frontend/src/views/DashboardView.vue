@@ -44,7 +44,7 @@
         </div>
         <div v-else class="dash-listings">
           <div class="dash-listing-row" v-for="l in myListings" :key="l.id">
-            <img :src="getImg(l.id)" :alt="l.title" class="row-img" />
+            <img :src="getImg(l)" :alt="l.title" class="row-img" />
             <div class="row-info">
               <h3>{{ l.title }}</h3>
               <p class="row-city">📍 {{ l.city }}</p>
@@ -55,7 +55,39 @@
             </div>
             <div class="row-actions">
               <RouterLink :to="`/annonces/${l.id}`" class="btn btn-outline btn-sm">Voir</RouterLink>
+              <RouterLink :to="`/annonces/${l.id}/edit`" class="btn btn-outline btn-sm">Modifier</RouterLink>
               <button class="btn btn-sm" style="color:var(--danger);border:1px solid var(--danger)" @click="deleteListing(l.id)">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Favorites tab -->
+      <div v-if="activeTab === 'favorites'" class="favorites-section">
+        <div v-if="loadingFavs" class="page-loader"><div class="spinner"></div></div>
+        <div v-else-if="favListings.length === 0" class="empty-dash">
+          <div class="empty-icon">♡</div>
+          <h3>Aucun favori pour l'instant</h3>
+          <p>Cliquez sur le cœur d'une annonce pour l'ajouter ici.</p>
+          <RouterLink to="/annonces" class="btn btn-primary">Explorer les logements</RouterLink>
+        </div>
+        <div v-else>
+          <div class="fav-tab-header">
+            <span>{{ favListings.length }} annonce{{ favListings.length !== 1 ? 's' : '' }} sauvegardée{{ favListings.length !== 1 ? 's' : '' }}</span>
+            <RouterLink to="/favoris" class="btn btn-outline btn-sm">Voir en pleine page →</RouterLink>
+          </div>
+          <div class="dash-listings">
+            <div class="dash-listing-row" v-for="l in favListings" :key="l.id">
+              <img :src="getImg(l)" :alt="l.title" class="row-img" />
+              <div class="row-info">
+                <h3>{{ l.title }}</h3>
+                <p class="row-city">📍 {{ l.city }}</p>
+                <p class="row-price"><strong>{{ formatPrice(l.pricePerNight) }} €</strong>/nuit</p>
+              </div>
+              <div class="row-actions">
+                <RouterLink :to="`/annonces/${l.id}`" class="btn btn-outline btn-sm">Voir</RouterLink>
+                <button class="btn btn-sm" style="color:#e74c3c;border:1px solid #e74c3c" @click="removeFav(l.id)">♥ Retirer</button>
+              </div>
             </div>
           </div>
         </div>
@@ -99,21 +131,28 @@
 import { ref, computed, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { listingService } from '@/services/api'
+import { useFavoritesStore } from '@/stores/favorites'
+import { listingService, userService, favoriteService } from '@/services/api'
 
 const auth = useAuthStore()
+const favStore = useFavoritesStore()
 const router = useRouter()
 const showToast = inject('showToast')
 
 const myListings = ref([])
 const loadingListings = ref(true)
+const favListings = ref([])
+const loadingFavs = ref(false)
 const activeTab = ref('listings')
 
 const roleLabel = computed(() => ({ tenant: 'Locataire', owner: 'Propriétaire', admin: 'Administrateur' }[auth.user?.role] || 'Utilisateur')  )
 const initials = computed(() => `${auth.user?.firstName?.[0] || ''}${auth.user?.lastName?.[0] || ''}`.toUpperCase())
 
 const tabs = computed(() => {
-  const t = [{ key: 'profile', icon: '👤', label: 'Mon profil' }]
+  const t = [
+    { key: 'profile', icon: '👤', label: 'Mon profil' },
+    { key: 'favorites', icon: '♥', label: 'Mes favoris' },
+  ]
   if (auth.isOwner) t.unshift({ key: 'listings', icon: '🏠', label: 'Mes annonces' })
   return t
 })
@@ -124,12 +163,16 @@ const statCards = computed(() => [
   { icon: '📅', label: 'Réservations', value: 0 },
 ])
 
-const IMGS = [
+const FALLBACK_IMGS = [
   'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=120&h=80&fit=crop',
   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=120&h=80&fit=crop',
   'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=120&h=80&fit=crop',
 ]
-function getImg(id) { return IMGS[id % IMGS.length] }
+function getImg(l) {
+  return l.images?.length
+    ? `/api${l.images[0].url}`
+    : FALLBACK_IMGS[l.id % FALLBACK_IMGS.length]
+}
 function formatPrice(p) { return Number(p).toLocaleString('fr-FR') }
 
 async function deleteListing(id) {
@@ -141,18 +184,35 @@ async function deleteListing(id) {
   } catch { showToast?.('Erreur lors de la suppression', 'error') }
 }
 
+async function removeFav(listingId) {
+  await favStore.toggle(listingId)
+  favListings.value = favListings.value.filter(l => l.id !== listingId)
+  showToast?.('Retiré des favoris', 'success')
+}
+
 function handleLogout() {
+  favStore.reset()
   auth.logout()
   router.push('/')
 }
 
 onMounted(async () => {
-  if (!auth.isOwner) { activeTab.value = 'profile'; loadingListings.value = false; return }
+  if (!auth.isOwner) { activeTab.value = 'profile'; loadingListings.value = false }
+  else {
+    try {
+      const { data } = await userService.getOne(auth.user.id)
+      myListings.value = data.user?.listings ?? []
+    } catch (e) { console.error('[dashboard] error:', e) }
+    finally { loadingListings.value = false }
+  }
+
+  loadingFavs.value = true
   try {
-    const { data } = await listingService.getAll()
-    myListings.value = data.filter(l => l.ownerId === auth.user?.id || l.owner?.id === auth.user?.id)
-  } catch { /* API non dispo */ }
-  finally { loadingListings.value = false }
+    await favStore.load()
+    const { data } = await favoriteService.getAll()
+    favListings.value = data.listings
+  } catch {}
+  finally { loadingFavs.value = false }
 })
 </script>
 
@@ -195,5 +255,7 @@ onMounted(async () => {
 .field-row:last-child { border-bottom: none; }
 .field-label { color: var(--text-muted); font-weight: 500; }
 .btn-danger { background: var(--danger); color: #fff; }
+.favorites-section { padding-bottom: 16px; }
+.fav-tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: .9rem; color: var(--text-muted); }
 @media (max-width: 700px) { .dash-header-inner { flex-direction: column; gap: 16px; } .dash-listing-row { flex-wrap: wrap; } .row-status { display: none; } }
 </style>

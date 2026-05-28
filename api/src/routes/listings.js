@@ -35,6 +35,7 @@ router.post(
 router.put(
   '/:id',
   authMiddleware,
+  upload.array('images', 5),
   [
     param('id').isInt().withMessage("L'identifiant doit être un entier"),
     body('title').optional().trim(),

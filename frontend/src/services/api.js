@@ -1,9 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: '/api',
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' }
 })
 
 // Attach JWT on every request
@@ -36,9 +35,7 @@ export const authService = {
 export const listingService = {
   getAll: (params = {}) => api.get('/annonces', { params }),
   getOne: (id) => api.get(`/annonces/${id}`),
-  create: (data) => api.post('/annonces', data, {
-  headers: data instanceof FormData ? {} : { 'Content-Type': 'application/json' },
-}),
+  create: (data) => api.post('/annonces', data),
   update: (id, data) => api.put(`/annonces/${id}`, data),
   remove: (id) => api.delete(`/annonces/${id}`),
 }
@@ -47,6 +44,14 @@ export const listingService = {
 export const userService = {
   getAll: () => api.get('/utilisateurs'),
   getOne: (id) => api.get(`/utilisateurs/${id}`),
+}
+
+// ── Favorites ─────────────────────────────────
+export const favoriteService = {
+  getAll: () => api.get('/favoris'),
+  getIds: () => api.get('/favoris/ids'),
+  add: (listingId) => api.post(`/favoris/${listingId}`),
+  remove: (listingId) => api.delete(`/favoris/${listingId}`),
 }
 
 export default api

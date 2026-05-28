@@ -29,11 +29,13 @@ services:
     restart: unless-stopped
     networks:
       - etnair-network
+    volumes:
+      - ./api/uploads:/app/uploads
 
   frontend:
     build: ./frontend
     environment:
-      VITE_API_URL: http://localhost:3000
+      API_URL: http://api:3000
     ports:
       - "5173:5173"
     depends_on:

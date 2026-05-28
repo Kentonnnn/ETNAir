@@ -6,7 +6,7 @@
       <div class="card-badge" v-if="listing.availableFrom">
         <span class="badge badge-success">Disponible</span>
       </div>
-      <button class="fav-btn" @click.prevent="toggleFav" :class="{ active: isFav }">
+      <button v-if="auth.isLoggedIn" class="fav-btn" @click.prevent="toggleFav" :class="{ active: isFav }">
         {{ isFav ? '♥' : '♡' }}
       </button>
     </div>
@@ -37,8 +37,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useFavoritesStore } from '@/stores/favorites'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({ listing: { type: Object, required: true } })
+
+const auth = useAuthStore()
+const favStore = useFavoritesStore()
 
 const FALLBACK_IMGS = [
   'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=280&fit=crop',
@@ -47,11 +52,20 @@ const FALLBACK_IMGS = [
   'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=280&fit=crop',
   'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=280&fit=crop',
 ]
-const imgUrl = ref(FALLBACK_IMGS[props.listing.id % FALLBACK_IMGS.length] || FALLBACK_IMGS[0])
-const isFav = ref(false)
+const imgUrl = ref(
+  props.listing.images?.length
+    ? `/api${props.listing.images[0].url}`
+    : FALLBACK_IMGS[props.listing.id % FALLBACK_IMGS.length] || FALLBACK_IMGS[0]
+)
+
+const isFav = computed(() => favStore.isFav(props.listing.id))
 
 function onImgError() { imgUrl.value = FALLBACK_IMGS[0] }
-function toggleFav() { isFav.value = !isFav.value }
+async function toggleFav() {
+  if (!auth.isLoggedIn) return
+  if (!favStore.loaded) await favStore.load()
+  await favStore.toggle(props.listing.id)
+}
 function truncate(str, n) { return str.length > n ? str.slice(0, n) + '…' : str }
 function formatPrice(p) { return Number(p).toLocaleString('fr-FR') }
 function formatDate(d) { return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) }
