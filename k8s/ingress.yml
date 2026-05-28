@@ -13,9 +13,12 @@ kind: Ingress
 metadata:
   name: etnair-ingress
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: default-strip-api-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
+  tls:
+  - secretName: etnair-tls-secret
   rules:
   - http:
       paths:
