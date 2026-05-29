@@ -13,7 +13,8 @@
           <span class="badge badge-accent">✈ Plateforme de location étudiante</span>
         </div>
         <h1 class="hero-title">
-          Trouvez votre<br><span>logement idéal</span>
+          <LetterReveal text="Trouvez votre" :delay="200" /><br>
+          <span><LetterReveal text="logement idéal" :delay="600" /></span>
         </h1>
         <p class="hero-subtitle">Des logements meublés et équipés dans toute la France. Réservez en quelques clics.</p>
         <!-- Search bar -->
@@ -155,6 +156,7 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import LetterReveal from '@/components/LetterReveal.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
