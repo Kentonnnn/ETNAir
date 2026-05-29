@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { coverPage, uncoverPage } from '@/stores/pageTransition'
 
 const routes = [
   { path: '/',             name: 'Home',         component: () => import('@/views/HomeView.vue') },
@@ -21,21 +20,10 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 })
 })
 
-let isFirstNavigation = true
-
-router.beforeEach(async (to, from) => {
+router.beforeEach((to) => {
   const auth = useAuthStore()
   if (to.meta.auth && !auth.isLoggedIn) return { name: 'Login' }
   if (to.meta.guest && auth.isLoggedIn) return { name: 'Home' }
-
-  if (!isFirstNavigation && from.name) {
-    await coverPage()
-  }
-  isFirstNavigation = false
-})
-
-router.afterEach(() => {
-  uncoverPage()
 })
 
 export default router
