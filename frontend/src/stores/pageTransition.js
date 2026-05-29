@@ -24,3 +24,8 @@ export function uncoverPage() {
     }, DURATION)
   })
 }
+
+/** Indique si le volet est actif (couvre l'écran ou en cours) */
+export function isVoletActive() {
+  return voletPhase.value !== 'idle'
+}
