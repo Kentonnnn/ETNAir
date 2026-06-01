@@ -14,12 +14,6 @@
         <RouterLink to="/" class="nav-link" @click="scrollTo('about')">Qui sommes-nous ?</RouterLink>
       </nav>
 
-      <!-- Theme toggle -->
-      <button class="theme-toggle" @click="theme.toggle()" :title="theme.dark ? 'Mode clair' : 'Mode sombre'">
-        <span v-if="theme.dark">☀️</span>
-        <span v-else>🌙</span>
-      </button>
-
       <!-- CTA area -->
       <div class="nav-cta">
         <template v-if="auth.isLoggedIn">
@@ -62,10 +56,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useThemeStore } from '@/stores/theme'
 
 const auth = useAuthStore()
-const theme = useThemeStore()
 const router = useRouter()
 const isScrolled = ref(false)
 const menuOpen = ref(false)
@@ -113,8 +105,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .nav-user { display: flex; align-items: center; gap: 8px; text-decoration: none; }
 .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; }
 .user-name { font-size: .9rem; font-weight: 600; color: var(--text); }
-.theme-toggle { background: none; border: 1.5px solid var(--border); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all .2s ease; flex-shrink: 0; }
-.theme-toggle:hover { transform: rotate(20deg) scale(1.1); border-color: var(--primary); }
 .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; margin-left: auto; }
 .burger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all .3s; }
 .mobile-menu { position: absolute; top: var(--nav-h); left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--border); padding: 12px 24px 20px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); }
@@ -126,12 +116,4 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   .nav-links, .nav-cta { display: none; }
   .burger { display: flex; }
 }
-
-/* Dark mode navbar — Sirnik style */
-:global([data-theme="dark"]) .navbar { background: #000; border-bottom-color: rgba(255,255,255,0.08); }
-:global([data-theme="dark"]) .navbar.scrolled { box-shadow: none; border-bottom-color: rgba(255,255,255,0.12); }
-:global([data-theme="dark"]) .mobile-menu { background: #000; border-color: rgba(255,255,255,0.1); }
-:global([data-theme="dark"]) .logo-text { color: #fff; }
-:global([data-theme="dark"]) .nav-link { color: rgba(255,255,255,0.6); }
-:global([data-theme="dark"]) .nav-link:hover, :global([data-theme="dark"]) .nav-link.router-link-active { background: rgba(255,255,255,0.06); color: #fff; }
 </style>
