@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { coverPage, uncoverPage, isVoletActive } from '@/stores/pageTransition'
+import { coverPage, uncoverPage } from '@/stores/pageTransition'
 
 const routes = [
   { path: '/',             name: 'Home',         component: () => import('@/views/HomeView.vue') },
@@ -29,7 +28,6 @@ router.beforeEach(async (to, from) => {
   if (to.meta.auth && !auth.isLoggedIn) return { name: 'Login' }
   if (to.meta.guest && auth.isLoggedIn) return { name: 'Home' }
 
-  // Bug 1 fix : on ne couvre jamais lors de la toute première navigation
   if (!isFirstNavigation && from.name) {
     await coverPage()
   }
@@ -37,14 +35,7 @@ router.beforeEach(async (to, from) => {
 })
 
 router.afterEach(() => {
-  // Bug 1 fix : si le volet n'a pas été activé (première navigation), on ne fait rien
-  if (!isVoletActive()) return
-
-  // Bug 2 fix : on attend que Vue ait monté le nouveau composant avant de découvrir,
-  // pour éviter que l'animation se termine avant que la page soit réellement prête
-  nextTick(() => {
-    uncoverPage()
-  })
+  uncoverPage()
 })
 
 export default router

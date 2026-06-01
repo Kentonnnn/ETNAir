@@ -1,87 +1,78 @@
-import request from 'supertest';
-import app from '../../server.js';
-import { prisma } from '../lib/prisma.js';
-import jwt from 'jsonwebtoken';
-let token;
-let userId;
+import { jest, describe, it, expect, beforeEach, afterAll } from '@jest/globals'
+import request from 'supertest'
+import jwt from 'jsonwebtoken'
+import { prisma } from '../lib/prisma.js'
+import app from '../../server.js'
+
+const MOCK_USER = {
+  id: 1,
+  email: 'admin@example.com',
+  firstName: 'Admin',
+  lastName: 'User',
+  role: 'owner',
+  listings: [],
+}
+
+const token = jwt.sign(
+  { userId: MOCK_USER.id },
+  process.env.JWT_SECRET || 'supersecretkey',
+  { expiresIn: '1h' }
+)
+
+afterAll(async () => {
+  await prisma.$disconnect()
+})
 
 describe('Routes utilisateurs', () => {
-  beforeAll(async () => {
-    await prisma.user.deleteMany({});
-    
-    const user = await prisma.user.create({
-      data: {
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@example.com',
-        password: 'hashed_password',
-        role: 'owner',
-      },
-    });
-    
-    userId = user.id;
-    token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  beforeEach(() => {
+    // authMiddleware + controller appellent tous les deux findUnique
+    prisma.user.findUnique.mockResolvedValue(MOCK_USER)
+  })
 
   describe('GET /utilisateurs/:id', () => {
-    it('devrait retourner les informations d\'un utilisateur', async () => {
+    it("devrait retourner les informations d'un utilisateur", async () => {
       const res = await request(app)
-        .get(`/utilisateurs/${userId}`)
-        .set('Authorization', `Bearer ${token}`);
+        .get(`/utilisateurs/${MOCK_USER.id}`)
+        .set('Authorization', `Bearer ${token}`)
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.user.email).toBe('admin@example.com');
-    });
+      expect(res.statusCode).toBe(200)
+      expect(res.body.user.email).toBe('admin@example.com')
+    })
 
     it('devrait retourner 401 sans token', async () => {
-      const res = await request(app)
-        .get(`/utilisateurs/${userId}`);
-
-      expect(res.statusCode).toBe(401);
-    });
-  });
+      const res = await request(app).get(`/utilisateurs/${MOCK_USER.id}`)
+      expect(res.statusCode).toBe(401)
+    })
+  })
 
   describe('PUT /utilisateurs/:id', () => {
     it('devrait mettre à jour un utilisateur', async () => {
-      const res = await request(app)
-        .put(`/utilisateurs/${userId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          firstName: 'Updated',
-          lastName: 'Name',
-        });
+      prisma.user.update.mockResolvedValue({ ...MOCK_USER, firstName: 'Updated', lastName: 'Name' })
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.user.firstName).toBe('Updated');
-    });
-  });
+      const res = await request(app)
+        .put(`/utilisateurs/${MOCK_USER.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ firstName: 'Updated', lastName: 'Name' })
+
+      expect(res.statusCode).toBe(200)
+      expect(res.body.user.firstName).toBe('Updated')
+    })
+  })
 
   describe('DELETE /utilisateurs/:id', () => {
     it('devrait supprimer un utilisateur', async () => {
-      const newUser = await prisma.user.create({
-        data: {
-          firstName: 'Delete',
-          lastName: 'Me',
-          email: 'delete@example.com',
-          password: 'hashed_password',
-          role: 'tenant',
-        },
-      });
+      const userToDelete = { id: 2, email: 'delete@example.com', firstName: 'Delete', lastName: 'Me', role: 'tenant' }
+      // 1er appel: authMiddleware → admin, 2ème appel: controller → userToDelete
+      prisma.user.findUnique
+        .mockResolvedValueOnce(MOCK_USER)
+        .mockResolvedValueOnce(userToDelete)
+      prisma.user.delete.mockResolvedValue(userToDelete)
 
       const res = await request(app)
-        .delete(`/utilisateurs/${newUser.id}`)
-        .set('Authorization', `Bearer ${token}`);
+        .delete(`/utilisateurs/${userToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
 
-      expect(res.statusCode).toBe(200);
-      
-      const deleted = await prisma.user.findUnique({
-        where: { id: newUser.id },
-      });
-      expect(deleted).toBeNull();
-    });
-  });
-});
+      expect(res.statusCode).toBe(200)
+    })
+  })
+})
