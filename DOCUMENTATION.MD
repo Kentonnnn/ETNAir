@@ -4,13 +4,13 @@
 
 ## 📋 Table des matières
 
-- perçu](#aperçu)
-- onctionnalités principales](#fonctionnalités-principales)
-  - [Consulter les annonces](#-consulter-les-annonces)
-  - [Réserver un logement](#-réserver-un-logement)
-  - [Créer une annonce](#-créer-une-annonce)
-  - [Supprimer une annonce](#-supprimer-une-annonce)
-  - [Carte interactive](#-carte-interactive)
+- [Aperçu](#aperçu)
+- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Consulter les annonces](#-consulter-les-annonces)
+- [Réserver un logement](#-réserver-un-logement)
+- [Créer une annonce](#-créer-une-annonce)
+- [Supprimer une annonce](#-supprimer-une-annonce)
+- [Carte interactive](#-carte-interactive)
 
 ---
 
@@ -18,11 +18,11 @@
 
 **ETNAir** est une plateforme web complète permettant aux utilisateurs de :
 
-- rcourir des annonces de locations (appartements, maisons, studios…)
-- server un bien directement en ligne
-- blier leurs propres annonces
-- rer et supprimer leurs annonces existantes
-- sualiser l'emplacement exact de chaque bien sur une carte interactive
+- Parcourir des annonces de locations (appartements, maisons, studios…)
+- Réserver un bien directement en ligne
+- Publier leurs propres annonces
+- Créer et supprimer leurs annonces existantes
+- Visualiser l'emplacement exact de chaque bien sur une carte interactive
 
 ---
 
@@ -31,10 +31,10 @@
 ### Créer un compte
 
 Pour créer un compte, il suffit de cliquer sur le bouton *Iscription* t de remplir les champs d'informations suivants :
-- énom
-- m de famille
-- resse email
-- t de passe (Attention : le mot de passe doit contenir au minimum 8 caractères)
+- Prénom
+- Nom de famille
+- Adresse email
+- Mot de passe (Attention : le mot de passe doit contenir au minimum 8 caractères)
 
 ---
 
@@ -47,13 +47,13 @@ Chaque annonce contient :
 -  Localisation (ville)
 -  Prix par nuit
 -  Description du logement avec les équipements à disposition
-- Note et avis des locataires précédents
+-  Note et avis des locataires précédents
 -  Disponibilités
 
 Des **filtres de recherche** permettent d'affiner les résultats par :
-- calisation
-- ix max par nuit
-- ix croissant/décroissant
+- Localisation
+- Prix max par nuit
+- Prix croissant/décroissant
 ---
 
 ### 📅 Réserver un logement
@@ -87,13 +87,12 @@ Une fois soumise, l'annonce est **publiée immédiatement** et visible par tous 
 
 ---
 
-### 🗑️ Supprimer une annonce
+### 📁 Gestion des annonces
 
 Depuis la section **"Mes annonces"** de votre espace personnel, vous pouvez gérer toutes vos publications :
 
-- **difier** une annonce existante (titre, prix, photos, disponibilités…)
-- **publier temporairement** une annonce sans la supprimer
-- **pprimer définitivement** une annonce
+- **Modifier** une annonce existante (titre, prix, photos, disponibilités…)
+- **Supprimer définitivement** une annonce
 
 > ⚠️La suppression d'une annonce est **irréversible**. Une confirmation est demandée avant toute suppression.
 
