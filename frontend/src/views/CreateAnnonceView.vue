@@ -206,7 +206,7 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.create-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 48px 0; }
+.create-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 48px 0; }
 .back-link { display: inline-block; color: rgba(255,255,255,.7); font-size: .85rem; margin-bottom: 16px; transition: color var(--transition); }
 .back-link:hover { color: #fff; }
 .create-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }

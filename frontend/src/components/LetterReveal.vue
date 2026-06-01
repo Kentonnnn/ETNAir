@@ -23,10 +23,17 @@ const visible = ref(false)
 const chars = computed(() => props.text.split(''))
 
 onMounted(() => {
+  if (!el.value) return
+  const rect = el.value.getBoundingClientRect()
+  const inView = rect.top < window.innerHeight && rect.bottom > 0
+  if (inView) {
+    visible.value = true
+    return
+  }
   const observer = new IntersectionObserver(
     ([entry]) => { if (entry.isIntersecting) { visible.value = true; observer.disconnect() } },
-    { threshold: 0.2 }
+    { threshold: 0 }
   )
-  if (el.value) observer.observe(el.value)
+  observer.observe(el.value)
 })
 </script>

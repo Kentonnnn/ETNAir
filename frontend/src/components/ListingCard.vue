@@ -1,5 +1,5 @@
 <template>
-  <RouterLink :to="`/annonces/${listing.id}`" class="listing-card">
+  <RouterLink :to="`/annonces/${listing.id}`" class="listing-card" @mousemove="onTilt" @mouseleave="resetTilt" ref="cardEl">
     <!-- Image -->
     <div class="card-img">
       <img :src="imgUrl" :alt="listing.title" loading="lazy" @error="onImgError" />
@@ -39,6 +39,22 @@
 import { ref, computed } from 'vue'
 import { useFavoritesStore } from '@/stores/favorites'
 import { useAuthStore } from '@/stores/auth'
+
+const cardEl = ref(null)
+
+function onTilt(e) {
+  const el = cardEl.value?.$el ?? cardEl.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  const x = (e.clientX - rect.left) / rect.width  - 0.5
+  const y = (e.clientY - rect.top)  / rect.height - 0.5
+  el.style.transform = `perspective(900px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) scale(1.03)`
+}
+
+function resetTilt() {
+  const el = cardEl.value?.$el ?? cardEl.value
+  if (el) el.style.transform = ''
+}
 
 const props = defineProps({ listing: { type: Object, required: true } })
 

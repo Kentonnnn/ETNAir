@@ -13,14 +13,15 @@
           <span class="badge badge-accent">✈ Plateforme de location étudiante</span>
         </div>
         <h1 class="hero-title">
-          Trouvez votre<br><span>logement idéal</span>
+          <LetterReveal text="Trouvez votre" :delay="200" /><br>
+          <span class="hero-accent"><LetterReveal text="logement idéal" :delay="600" /></span>
         </h1>
-        <p class="hero-subtitle">Des logements meublés et équipés dans toute la France. Réservez en quelques clics.</p>
+        <p class="hero-subtitle" v-reveal="'up'" data-delay="800">Des logements meublés et équipés dans toute la France. Réservez en quelques clics.</p>
         <!-- Search bar -->
-        <SearchBar @search="goSearch" />
+        <div v-reveal="'up'" data-delay="1000"><SearchBar @search="goSearch" /></div>
         <div class="hero-stats">
-          <div class="stat" v-for="s in stats" :key="s.label">
-            <strong>{{ s.value }}</strong>
+          <div class="stat float" v-for="s in stats" :key="s.label">
+            <strong><CountUp :target="s.target" :suffix="s.suffix" /></strong>
             <span>{{ s.label }}</span>
           </div>
         </div>
@@ -35,36 +36,16 @@
     <section class="section categories-section">
       <div class="container">
         <div class="categories-grid">
-          <RouterLink v-for="cat in categories" :key="cat.label"
-            :to="`/annonces?city=${cat.city}`" class="cat-card">
-            <div class="cat-img" :style="{ backgroundImage: `url(${cat.img})` }"></div>
-            <div class="cat-body">
-              <h3>{{ cat.label }}</h3>
-              <span>{{ cat.count }}</span>
-            </div>
-          </RouterLink>
-        </div>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS ─────────────────────────────── -->
-    <section class="section how-section" id="how">
-      <div class="container">
-        <p class="section-badge">Simple & rapide</p>
-        <h2 class="section-title">Comment <span>réserver</span> mon logement ?</h2>
-        <p class="section-subtitle">4 étapes simples pour trouver votre logement idéal</p>
-        <div class="steps-grid">
-          <div class="step-card" v-for="(step, i) in steps" :key="i">
-            <div class="step-icon">{{ step.icon }}</div>
-            <div class="step-num">{{ i + 1 }}</div>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.desc }}</p>
+          <div v-for="(cat, i) in categories" :key="cat.label"
+            v-reveal="'scale'" :data-delay="i * 100">
+            <RouterLink :to="`/annonces?city=${cat.city}`" class="cat-card">
+              <div class="cat-img" :style="{ backgroundImage: `url(${cat.img})` }"></div>
+              <div class="cat-body">
+                <h3>{{ cat.label }}</h3>
+                <span>{{ cat.count }}</span>
+              </div>
+            </RouterLink>
           </div>
-        </div>
-        <div style="text-align:center;margin-top:40px">
-          <RouterLink to="/annonces" class="btn btn-primary btn-lg">
-            Voir les logements →
-          </RouterLink>
         </div>
       </div>
     </section>
@@ -155,6 +136,8 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import LetterReveal from '@/components/LetterReveal.vue'
+import CountUp from '@/components/CountUp.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -170,9 +153,9 @@ const slides = [
 ]
 
 const stats = [
-  { value: '500+', label: 'Logements disponibles' },
-  { value: '50+', label: 'Villes en France' },
-  { value: '10 000+', label: 'Étudiants satisfaits' },
+  { target: 500, suffix: '+', label: 'Logements disponibles' },
+  { target: 50,  suffix: '+', label: 'Villes en France' },
+  { target: 10000, suffix: '+', label: 'Étudiants satisfaits' },
 ]
 
 const categories = [
@@ -182,12 +165,6 @@ const categories = [
   { label: 'Bordeaux', city: 'Bordeaux', count: 'Nouvelle-Aquitaine', img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=300&h=200&fit=crop' },
 ]
 
-const steps = [
-  { icon: '🏠', title: 'Choisissez votre logement', desc: 'Parcourez nos annonces et trouvez le logement qui correspond à vos critères.' },
-  { icon: '📱', title: 'Faites votre demande', desc: 'Créez un compte et soumettez votre demande en quelques clics.' },
-  { icon: '📄', title: 'Envoyez vos justificatifs', desc: 'Téléchargez vos documents directement depuis votre espace personnel.' },
-  { icon: '🔑', title: 'Bienvenue chez vous !', desc: 'Emménagez et profitez de votre nouveau logement étudiant.' },
-]
 
 const perks = [
   { icon: '🔒', title: 'Logements 100% sécurisés', desc: 'Tous nos logements sont vérifiés et les propriétaires validés.' },
@@ -214,7 +191,7 @@ function goSearch({ city, maxPrice }) {
 onMounted(async () => {
   try {
     const { data } = await listingService.getAll()
-    listings.value = data.slice(0, 6)
+    listings.value = (data.listings ?? data).slice(0, 6)
   } catch { /* API non dispo */ }
   finally { loadingListings.value = false }
 
@@ -235,8 +212,9 @@ onUnmounted(() => clearInterval(slideTimer))
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(4,88,160,.85) 40%, rgba(4,88,160,.4)); }
 .hero-content { position: relative; z-index: 1; color: #fff; }
 .hero-badge { margin-bottom: 20px; }
-.hero-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
-.hero-title span { color: var(--accent); }
+.hero-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; color: #fff; }
+.hero-title .hero-accent, .hero-title .hero-accent .letter-reveal-wrap, .hero-title .hero-accent .lr-letter { color: var(--accent) !important; -webkit-text-fill-color: var(--accent) !important; }
+.hero-title > .letter-reveal-wrap { color: #fff; }
 .hero-subtitle { font-size: 1.1rem; opacity: .9; margin-bottom: 32px; max-width: 500px; }
 .hero-stats { display: flex; gap: 40px; margin-top: 32px; }
 .stat { display: flex; flex-direction: column; }
@@ -290,13 +268,14 @@ onUnmounted(() => clearInterval(slideTimer))
 .perk p { font-size: .875rem; color: var(--text-muted); }
 
 /* FEATURES STRIP */
-.features-strip { background: var(--primary); padding: 24px 0; }
+.features-strip { background: #0458a0; padding: 24px 0; }
 .features-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.feature { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 500; }
+.feature { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 500; background: transparent !important; padding: 0 !important; border: none !important; }
+.feature span { background: transparent !important; color: inherit !important; }
 .feature-icon { font-size: 1.2rem; }
 
 /* CTA BANNER */
-.cta-banner { background: linear-gradient(135deg, #0f172a 0%, var(--primary-dark) 100%); padding: 80px 0; color: #fff; }
+.cta-banner { background: linear-gradient(135deg, #0f172a 0%, #034080 100%); padding: 80px 0; color: #fff; }
 .cta-inner { display: flex; justify-content: space-between; align-items: center; gap: 40px; }
 .cta-inner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
 .cta-inner p { opacity: .8; }

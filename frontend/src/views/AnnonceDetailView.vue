@@ -208,6 +208,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.detail-page { background: var(--bg); min-height: 100vh; position: relative; z-index: 0; }
 .breadcrumb-bar { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 0; }
 .breadcrumb { font-size: .85rem; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
 .breadcrumb a { color: var(--primary); }

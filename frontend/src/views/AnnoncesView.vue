@@ -61,8 +61,10 @@
           </div>
         </div>
 
-        <!-- Loading -->
-        <div v-if="loading" class="page-loader"><div class="spinner"></div></div>
+        <!-- Loading skeleton -->
+        <div v-if="loading" :class="viewMode === 'grid' ? 'grid-3' : 'list-view'">
+          <SkeletonCard v-for="n in 6" :key="n" />
+        </div>
 
         <!-- Error -->
         <div v-else-if="error" class="alert alert-error">{{ error }}</div>
@@ -80,7 +82,10 @@
 
         <!-- Grid / List -->
         <div v-else :class="viewMode === 'grid' ? 'grid-3' : 'list-view'">
-          <ListingCard v-for="l in paginated" :key="l.id" :listing="l" />
+          <div v-for="(l, i) in paginated" :key="l.id"
+            v-reveal="'scale'" :data-delay="(i % 6) * 80">
+            <ListingCard :listing="l" />
+          </div>
         </div>
 
         <!-- Pagination -->
@@ -103,6 +108,7 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 import MapView from '@/components/MapView.vue'
 
 const route = useRoute()
@@ -152,7 +158,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 60px 0 80px; }
+.page-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 60px 0 80px; }
 .page-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
 .page-header h1 span { color: var(--accent); }
 .page-header p { opacity: .85; margin-bottom: 32px; font-size: 1rem; }

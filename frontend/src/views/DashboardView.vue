@@ -217,7 +217,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dash-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 48px 0 80px; }
+.dash-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 48px 0 80px; }
 .dash-header-inner { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
 .dash-greeting { font-size: .95rem; opacity: .8; margin-bottom: 4px; }
 .dash-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }

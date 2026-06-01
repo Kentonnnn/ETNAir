@@ -10,8 +10,8 @@
       <!-- Desktop nav -->
       <nav class="nav-links">
         <RouterLink to="/annonces" class="nav-link">Nos logements</RouterLink>
-        <RouterLink to="/" class="nav-link" @click="scrollTo('how')">Comment réserver ?</RouterLink>
-        <RouterLink to="/" class="nav-link" @click="scrollTo('about')">Qui sommes-nous ?</RouterLink>
+        <RouterLink to="/comment-reserver" class="nav-link">Comment réserver ?</RouterLink>
+        <RouterLink to="/qui-sommes-nous" class="nav-link">Qui sommes-nous ?</RouterLink>
       </nav>
 
       <!-- Theme toggle -->
@@ -46,6 +46,7 @@
     <Transition name="slide-down">
       <div v-if="menuOpen" class="mobile-menu">
         <RouterLink to="/annonces" class="mobile-link" @click="menuOpen=false">Nos logements</RouterLink>
+        <RouterLink to="/comment-reserver" class="mobile-link" @click="menuOpen=false">Comment réserver ?</RouterLink>
         <RouterLink to="/login" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Connexion</RouterLink>
         <RouterLink to="/register" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Inscription</RouterLink>
         <RouterLink to="/favoris" class="mobile-link" @click="menuOpen=false" v-if="auth.isLoggedIn">♥ Mes favoris</RouterLink>
