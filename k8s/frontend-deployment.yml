@@ -20,10 +20,3 @@ spec:
           value: "https://172.16.248.98/api"
         ports:
         - containerPort: 5173
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "200m"
-            memory: "256Mi"
