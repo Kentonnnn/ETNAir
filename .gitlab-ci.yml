@@ -1,5 +1,6 @@
 stages:
   - test
+  - e2e
   - deploy
 
 test:
@@ -16,6 +17,29 @@ test:
     - cd api
     - npm install
     - npm test || true
+
+e2e:
+  stage: e2e
+  image: cypress/included:13.6.0
+  only:
+    - develop
+    - main
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-frontend
+    paths:
+      - frontend/node_modules/
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npx vite &
+    - npx wait-on http://localhost:5173 --timeout 30000
+    - npx cypress run --headless
+  artifacts:
+    when: always
+    paths:
+      - frontend/cypress/screenshots/
+    expire_in: 7 days
 
 deploy:
   stage: deploy
