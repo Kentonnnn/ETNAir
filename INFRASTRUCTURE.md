@@ -1,5 +1,21 @@
 # Documentation Technique — ETNAir Infrastructure
 
+## Résumé
+
+Nelson Pires Da Silva — Architecte Cloud, Infrastructure & DevOps
+
+En tant qu'architecte infrastructure sur le projet ETNAir, j'ai mis en place l'ensemble de l'infrastructure de bout en bout sur une VM école sous réseau privé VPN :
+
+- **Environnement local** : Docker Compose (API, BDD, pgAdmin, Frontend) + Git Flow + double remote GitHub/GitLab
+- **Kubernetes K3s** : déploiement de tous les services (API, Frontend, PostgreSQL, MinIO) sur 4 namespaces, Ingress Traefik, Secrets, HPA
+- **CI/CD** : GitHub Actions + GitLab CI + mirror automatique GitHub → GitLab + GitLab Runner déployé sur K8s via Helm
+- **Monitoring** : Prometheus + Grafana (5 dashboards) + Loki + Promtail + alertes Prometheus (CPU, RAM, Pod Down, Disk)
+- **Sécurité** : TLS/HTTPS avec cert-manager (certificat auto-signé, IP privée)
+- **Tests** : K6 (100% succès, 10 VUs, p95 = 16ms, 0% erreur) + tests de résilience (suppression pod → recréation automatique)
+- **Bonus** : backup PostgreSQL automatique (CronJob K8s à 2h00), optimisation CPU/RAM limits sur tous les pods
+
+---
+
 ## 1. Présentation du projet
 
 ETNAir est une plateforme de location courte et moyenne durée (type Airbnb). Ce document décrit l'architecture infrastructure mise en place pour déployer, monitorer et maintenir l'application sur les 5 étapes du projet.
@@ -418,4 +434,3 @@ La BDD est alimentée avec des données de test générées via **Faker** :
 | GitLab Runner | CI/CD | 18.x |
 | Helm | Gestionnaire packages K8s | 3.x |
 | K6 | Tests de charge | - |
-| cert-manager | TLS/HTTPS auto-signé | - |
