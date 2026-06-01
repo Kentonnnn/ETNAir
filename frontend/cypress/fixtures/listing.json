@@ -1,0 +1,15 @@
+{
+  "listing": {
+    "id": 1,
+    "title": "Studio meublé Paris 11e",
+    "description": "Beau studio entièrement meublé, idéal pour étudiant. Proche métro, commerces.",
+    "city": "Paris",
+    "pricePerNight": 65,
+    "availableFrom": "2026-06-01",
+    "availableTo": "2026-08-31",
+    "ownerId": 10,
+    "images": [],
+    "reviews": [],
+    "owner": { "id": 10, "firstName": "Marie", "lastName": "Dupont", "email": "marie@test.com" }
+  }
+}
