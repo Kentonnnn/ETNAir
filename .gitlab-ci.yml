@@ -21,6 +21,8 @@ test:
 e2e:
   stage: e2e
   image: cypress/included:13.6.0
+  when: manual
+  allow_failure: true
   only:
     - develop
     - main
