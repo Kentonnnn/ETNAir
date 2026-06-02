@@ -96,11 +96,20 @@
       <!-- Profile tab -->
       <div v-if="activeTab === 'profile'" class="profile-section">
         <div class="profile-card">
-          <div class="profile-avatar">{{ initials }}</div>
+          <div class="profile-avatar-edit" @click="$refs.picInput.click()" :title="pic ? 'Changer la photo' : 'Ajouter une photo'">
+            <img v-if="pic" :src="pic" alt="Photo de profil" />
+            <span v-else>{{ initials }}</span>
+            <div class="avatar-overlay"><span>📷</span></div>
+            <input ref="picInput" type="file" accept="image/*" style="display:none" @change="onPicChange" />
+          </div>
           <div class="profile-info">
             <h2>{{ auth.user?.firstName }} {{ auth.user?.lastName }}</h2>
             <p>{{ auth.user?.email }}</p>
             <span class="badge badge-primary">{{ roleLabel }}</span>
+            <div v-if="pic" class="avatar-actions">
+              <button class="btn btn-sm btn-outline" @click="$refs.picInput.click()">Changer la photo</button>
+              <button class="btn btn-sm" style="color:var(--danger);border:1px solid var(--danger)" @click="removePic">Supprimer</button>
+            </div>
           </div>
         </div>
         <div class="profile-fields">
@@ -133,9 +142,27 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
 import { listingService, userService, favoriteService } from '@/services/api'
+import { useProfilePic } from '@/stores/profilePic'
 
 const auth = useAuthStore()
 const favStore = useFavoritesStore()
+const { pic, setPic, removePic } = useProfilePic()
+
+function onPicChange(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (file.size > 2 * 1024 * 1024) {
+    showToast?.('Image trop lourde (max 2 Mo)', 'error')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = ev => {
+    setPic(ev.target.result)
+    showToast?.('Photo de profil mise à jour', 'success')
+  }
+  reader.readAsDataURL(file)
+  e.target.value = ''
+}
 const router = useRouter()
 const showToast = inject('showToast')
 
@@ -164,9 +191,16 @@ const statCards = computed(() => [
 ])
 
 const FALLBACK_IMGS = [
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=120&h=80&fit=crop',
   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=120&h=80&fit=crop',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=120&h=80&fit=crop',
 ]
 function getImg(l) {
   return l.images?.length
@@ -248,6 +282,13 @@ onMounted(async () => {
 .profile-section { max-width: 600px; }
 .profile-card { display: flex; align-items: center; gap: 24px; background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 28px; margin-bottom: 24px; }
 .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; flex-shrink: 0; }
+.profile-avatar-edit { position: relative; width: 96px; height: 96px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; flex-shrink: 0; cursor: pointer; overflow: hidden; transition: transform .2s ease; }
+.profile-avatar-edit:hover { transform: scale(1.05); }
+.profile-avatar-edit img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.profile-avatar-edit .avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); color: #fff; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s ease; font-size: 1.5rem; }
+.profile-avatar-edit:hover .avatar-overlay { opacity: 1; }
+.avatar-actions { display: flex; gap: 8px; margin-top: 12px; }
+:global([data-theme="dark"]) .profile-avatar-edit { background: #fff; color: #000; }
 .profile-info h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
 .profile-info p { color: var(--text-muted); font-size: .9rem; margin-bottom: 8px; }
 .profile-fields { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }

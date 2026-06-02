@@ -92,7 +92,10 @@
         <div class="pagination" v-if="totalPages > 1 && viewMode !== 'map'">
           <button class="page-btn" :disabled="page <= 1" @click="page--">← Précédent</button>
           <div class="page-nums">
-            <button v-for="p in totalPages" :key="p" :class="['page-num', { active: page === p }]" @click="page = p">{{ p }}</button>
+            <template v-for="(p, i) in visiblePages" :key="i">
+              <span v-if="p === '...'" class="page-ellipsis">…</span>
+              <button v-else :class="['page-num', { active: page === p }]" @click="page = p">{{ p }}</button>
+            </template>
           </div>
           <button class="page-btn" :disabled="page >= totalPages" @click="page++">Suivant →</button>
         </div>
@@ -136,6 +139,23 @@ const filtered = computed(() => {
 const totalPages = computed(() => Math.ceil(filtered.value.length / PER_PAGE))
 const paginated = computed(() => filtered.value.slice((page.value - 1) * PER_PAGE, page.value * PER_PAGE))
 
+// Compact pagination: 1 … (cur-1) cur (cur+1) … last
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const cur = page.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+
+  const pages = new Set([1, 2, total - 1, total, cur - 1, cur, cur + 1])
+  const sorted = [...pages].filter(p => p >= 1 && p <= total).sort((a, b) => a - b)
+
+  const result = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('...')
+    result.push(sorted[i])
+  }
+  return result
+})
+
 watch(filtered, () => { page.value = 1 })
 
 function applyFilters({ city, maxPrice } = {}) {
@@ -149,7 +169,7 @@ function resetFilters() {
 
 onMounted(async () => {
   try {
-    const { data } = await listingService.getAll()
+    const { data } = await listingService.getAll({ limit: 1000 })
     allListings.value = data.listings ?? data
   } catch (e) {
     error.value = 'Impossible de charger les annonces. Vérifiez que l\'API est démarrée.'
@@ -158,11 +178,11 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 60px 0 80px; }
+.page-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 60px 0 40px; }
 .page-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
 .page-header h1 span { color: var(--accent); }
 .page-header p { opacity: .85; margin-bottom: 32px; font-size: 1rem; }
-.page-body { display: grid; grid-template-columns: 260px 1fr; gap: 32px; margin-top: -40px; padding-bottom: 60px; align-items: start; }
+.page-body { display: grid; grid-template-columns: 260px 1fr; gap: 32px; padding: 40px 0 60px; align-items: start; background: var(--bg); }
 .filters { position: sticky; top: calc(var(--nav-h) + 20px); }
 .filter-panel { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 20px; }
 .filter-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; }
@@ -187,7 +207,8 @@ select.form-input { cursor: pointer; }
 .page-btn { padding: 10px 20px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; font-family: var(--font); font-size: .9rem; transition: all var(--transition); }
 .page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
 .page-btn:disabled { opacity: .4; cursor: not-allowed; }
-.page-nums { display: flex; gap: 4px; }
+.page-nums { display: flex; gap: 4px; align-items: center; }
+.page-ellipsis { color: var(--text-muted); padding: 0 6px; font-weight: 600; user-select: none; }
 .page-num { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: .9rem; transition: all var(--transition); }
 .page-num.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 @media (max-width: 900px) { .page-body { grid-template-columns: 1fr; } .filters { position: static; } }

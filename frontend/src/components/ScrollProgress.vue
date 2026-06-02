@@ -1,6 +1,10 @@
 <template>
   <div class="scroll-progress" aria-hidden="true">
-    <div class="sp-track">
+    <div
+      class="sp-track"
+      ref="trackEl"
+      @pointerdown="onPointerDown"
+    >
       <div class="sp-thumb" :style="{ top: percent + '%' }">
         <span class="sp-label">{{ Math.round(percent) }}%</span>
       </div>
@@ -12,7 +16,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const percent = ref(0)
+const trackEl = ref(null)
 let ticking = false
+let dragging = false
 
 function onScroll() {
   if (ticking) return
@@ -26,6 +32,34 @@ function onScroll() {
   })
 }
 
+function scrollToPointer(clientY, smooth = true) {
+  if (!trackEl.value) return
+  const rect = trackEl.value.getBoundingClientRect()
+  const ratio = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height))
+  const h = document.documentElement
+  const total = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight
+  window.scrollTo({ top: total * ratio, behavior: smooth ? 'smooth' : 'auto' })
+}
+
+function onPointerDown(e) {
+  e.preventDefault()
+  dragging = true
+  scrollToPointer(e.clientY, true)
+  window.addEventListener('pointermove', onPointerMove)
+  window.addEventListener('pointerup', onPointerUp)
+}
+
+function onPointerMove(e) {
+  if (!dragging) return
+  scrollToPointer(e.clientY, false)
+}
+
+function onPointerUp() {
+  dragging = false
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
+}
+
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', onScroll, { passive: true })
@@ -34,6 +68,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', onScroll)
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
 })
 </script>
 
@@ -56,7 +92,15 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, .08);
   border-radius: 2px;
   overflow: visible;
+  pointer-events: auto;
+  cursor: pointer;
+  /* Larger invisible click target */
+  padding: 0 10px;
+  margin: 0 -10px;
+  background-clip: content-box;
 }
+.sp-track:hover { background-color: rgba(0, 0, 0, .15); background-clip: content-box; }
+[data-theme="dark"] .sp-track:hover { background-color: rgba(255, 255, 255, .18); background-clip: content-box; }
 
 .sp-thumb {
   position: absolute;

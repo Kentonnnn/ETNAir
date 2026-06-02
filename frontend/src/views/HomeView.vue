@@ -190,7 +190,7 @@ function goSearch({ city, maxPrice }) {
 
 onMounted(async () => {
   try {
-    const { data } = await listingService.getAll()
+    const { data } = await listingService.getAll({ limit: 6 })
     listings.value = (data.listings ?? data).slice(0, 6)
   } catch { /* API non dispo */ }
   finally { loadingListings.value = false }
@@ -297,5 +297,24 @@ onUnmounted(() => clearInterval(slideTimer))
   .categories-grid, .steps-grid { grid-template-columns: 1fr; }
   .cta-actions { flex-direction: column; width: 100%; }
   .section-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+/* Dark mode — kill the rogue blue strips */
+:global([data-theme="dark"]) .features-strip {
+  background: #1f1f23;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+:global([data-theme="dark"]) .features-strip .feature,
+:global([data-theme="dark"]) .features-strip .feature span {
+  color: rgba(255,255,255,0.85);
+  background: transparent;
+}
+:global([data-theme="dark"]) .cta-banner {
+  background: #1f1f23;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+:global([data-theme="dark"]) .hero-overlay {
+  background: linear-gradient(to right, rgba(13,13,16,0.92) 40%, rgba(13,13,16,0.6));
 }
 </style>

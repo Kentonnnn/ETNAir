@@ -81,6 +81,9 @@
               </div>
             </div>
           </div>
+
+          <!-- Reviews -->
+          <ReviewSection :listing-id="listing.id" />
         </div>
 
         <!-- Right: booking card -->
@@ -149,6 +152,7 @@ import { ref, computed, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
+import ReviewSection from '@/components/ReviewSection.vue'
 
 const route = useRoute()
 const router = useRouter()
