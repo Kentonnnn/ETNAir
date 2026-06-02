@@ -23,7 +23,7 @@ app.directive('reveal', {
   },
 })
 
-// Prefetch Lottie JSON
+// Prefetch Lottie JSON for route transitions
 try {
   if (typeof fetch === 'function') {
     fetch('/travel-loader.json', { cache: 'force-cache' })
