@@ -1,0 +1,12 @@
+.fav-header { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; padding: 48px 0; }
+.back-link { display: inline-block; color: rgba(255,255,255,.7); font-size: .85rem; margin-bottom: 16px; transition: color var(--transition); }
+.back-link:hover { color: #fff; }
+.fav-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+.fav-header h1 span { color: #ffd6d6; }
+.fav-header p { opacity: .8; }
+.fav-body { padding: 48px 24px 80px; }
+.empty-state { text-align: center; padding: 80px 0; }
+.empty-icon { font-size: 5rem; margin-bottom: 16px; color: #e74c3c; line-height: 1; }
+.empty-state h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.empty-state p { color: var(--text-muted); margin-bottom: 24px; }
+.listings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }

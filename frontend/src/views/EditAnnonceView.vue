@@ -226,41 +226,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.create-header { background: linear-gradient(135deg, #034080, #0458a0); color: #fff; padding: 48px 0; }
-.back-link { display: inline-block; color: rgba(255,255,255,.7); font-size: .85rem; margin-bottom: 16px; transition: color var(--transition); }
-.back-link:hover { color: #fff; }
-.create-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-.create-header h1 span { color: var(--accent); }
-.create-header p { opacity: .8; }
-.create-body { padding: 40px 24px 80px; }
-.create-grid { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
-.create-form { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
-.form-section { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
-.form-section:last-of-type { border-bottom: none; margin-bottom: 24px; }
-.form-section-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; }
-textarea.form-input { resize: vertical; font-family: var(--font); }
-.char-count { font-size: .78rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.existing-thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
-.thumb-wrapper { position: relative; }
-.thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid transparent; transition: opacity .2s, border-color .2s; }
-.to-remove + .thumb, .thumb-wrapper:has(.to-remove) .thumb { opacity: .35; border-color: var(--danger); }
-.thumb-remove { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; line-height: 20px; text-align: center; padding: 0; }
-.thumb-remove.to-remove { background: var(--primary); }
-.remove-note { font-size: .8rem; color: var(--danger); margin-top: 6px; }
-.dropzone { border: 2px dashed #ccc; border-radius: 10px; padding: 24px; text-align: center; cursor: pointer; transition: border-color .2s; min-height: 90px; }
-.dropzone:hover { border-color: var(--primary); }
-.preview-thumbnails { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.preview-area { position: sticky; top: calc(var(--nav-h) + 24px); }
-.preview-title { font-weight: 700; color: var(--text); margin-bottom: 16px; }
-.preview-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.preview-img { height: 180px; }
-.preview-img img { width: 100%; height: 100%; object-fit: cover; }
-.preview-body { padding: 16px; }
-.preview-city { font-size: .8rem; color: var(--text-muted); margin-bottom: 6px; }
-.preview-name { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-.preview-price { font-size: .9rem; color: var(--text-muted); }
-.preview-price strong { color: var(--primary); font-size: 1.2rem; }
-@media (max-width: 900px) { .create-grid { grid-template-columns: 1fr; } .preview-area { position: static; } }
-@media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+@import "../assets/css/edit-annonce.css";
 </style>
