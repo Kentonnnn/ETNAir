@@ -55,7 +55,7 @@
               une promesse, un engagement envers ceux qui l'utilisent.
             </p>
             <p class="team-text">
-              Nous avons construit ETNAir avec l'idée qu'un étudiant méritait
+              Nous avons construit ETNAir avec l'idée que chacun méritait
               autant d'attention qu'un client haut de gamme. Que la simplicité
               n'était pas l'opposé de l'exigence, mais sa forme la plus aboutie.
             </p>
@@ -81,7 +81,7 @@
           <div v-reveal="'left'">
             <p class="section-badge">Notre mission</p>
             <h2 class="mission-title">
-              Rendre le logement étudiant <span class="gradient-text">simple, juste, accessible.</span>
+              Rendre le logement <span class="gradient-text">simple, juste, accessible.</span>
             </h2>
           </div>
           <div class="mission-values">
@@ -101,7 +101,7 @@
       <div class="container">
         <h2 v-reveal="'up'">Rejoignez l'aventure</h2>
         <p v-reveal="'up'" data-delay="100">
-          Plus de 10 000 étudiants nous font déjà confiance pour leur logement.
+          Plus de 10 000 utilisateurs nous font déjà confiance pour leur logement.
         </p>
         <div class="cta-btns" v-reveal="'up'" data-delay="200">
           <RouterLink to="/register" class="btn btn-primary btn-lg">Créer un compte</RouterLink>
@@ -124,16 +124,16 @@ const team = [
 
 const stats = [
   { target: 600,   suffix: '+', label: 'Logements référencés sur la plateforme' },
-  { target: 10000, suffix: '+', label: 'Étudiants satisfaits depuis le lancement' },
+  { target: 10000, suffix: '+', label: 'Utilisateurs satisfaits depuis le lancement' },
   { target: 50,    suffix: '+', label: 'Villes couvertes en France' },
   { target: 98,    suffix: '%', label: 'Taux de satisfaction propriétaire' },
 ]
 
 const values = [
-  { icon: '◆', title: 'Transparence',   desc: 'Aucun frais caché, aucune commission étudiante. Les prix affichés sont les prix réels.' },
+  { icon: '◆', title: 'Transparence',   desc: 'Aucun frais caché, aucune commission. Les prix affichés sont les prix réels.' },
   { icon: '◇', title: 'Confiance',      desc: 'Chaque annonce est vérifiée, chaque propriétaire est validé avant publication.' },
   { icon: '◈', title: 'Engagement',     desc: 'Une équipe disponible et un support réactif pour répondre à vos questions.' },
-  { icon: '◉', title: 'Innovation',     desc: 'Une plateforme moderne pensée pour la nouvelle génération d\'étudiants.' },
+  { icon: '◉', title: 'Innovation',     desc: 'Une plateforme moderne pensée pour tous les profils.' },
 ]
 </script>
 

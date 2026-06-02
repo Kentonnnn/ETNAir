@@ -4,7 +4,7 @@
       <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&h=900&fit=crop" alt="Logement" />
       <div class="visual-overlay">
         <div class="visual-logo">✈ ETN<strong>Air</strong></div>
-        <blockquote>"Trouver son logement étudiant n'a jamais été aussi simple."</blockquote>
+        <blockquote>"Trouver un logement n'a jamais été aussi simple."</blockquote>
       </div>
     </div>
 
