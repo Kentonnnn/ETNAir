@@ -13,14 +13,15 @@
           <span class="badge badge-accent">✈ Plateforme de location étudiante</span>
         </div>
         <h1 class="hero-title">
-          Trouvez votre<br><span>logement idéal</span>
+          <LetterReveal text="Trouvez votre" :delay="200" /><br>
+          <span class="hero-accent"><LetterReveal text="logement idéal" :delay="600" /></span>
         </h1>
-        <p class="hero-subtitle">Des logements meublés et équipés dans toute la France. Réservez en quelques clics.</p>
+        <p class="hero-subtitle" v-reveal="'up'" data-delay="800">Des logements meublés et équipés dans toute la France. Réservez en quelques clics.</p>
         <!-- Search bar -->
-        <SearchBar @search="goSearch" />
+        <div v-reveal="'up'" data-delay="1000"><SearchBar @search="goSearch" /></div>
         <div class="hero-stats">
-          <div class="stat" v-for="s in stats" :key="s.label">
-            <strong>{{ s.value }}</strong>
+          <div class="stat float" v-for="s in stats" :key="s.label">
+            <strong><CountUp :target="s.target" :suffix="s.suffix" /></strong>
             <span>{{ s.label }}</span>
           </div>
         </div>
@@ -35,36 +36,16 @@
     <section class="section categories-section">
       <div class="container">
         <div class="categories-grid">
-          <RouterLink v-for="cat in categories" :key="cat.label"
-            :to="`/annonces?city=${cat.city}`" class="cat-card">
-            <div class="cat-img" :style="{ backgroundImage: `url(${cat.img})` }"></div>
-            <div class="cat-body">
-              <h3>{{ cat.label }}</h3>
-              <span>{{ cat.count }}</span>
-            </div>
-          </RouterLink>
-        </div>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS ─────────────────────────────── -->
-    <section class="section how-section" id="how">
-      <div class="container">
-        <p class="section-badge">Simple & rapide</p>
-        <h2 class="section-title">Comment <span>réserver</span> mon logement ?</h2>
-        <p class="section-subtitle">4 étapes simples pour trouver votre logement idéal</p>
-        <div class="steps-grid">
-          <div class="step-card" v-for="(step, i) in steps" :key="i">
-            <div class="step-icon">{{ step.icon }}</div>
-            <div class="step-num">{{ i + 1 }}</div>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.desc }}</p>
+          <div v-for="(cat, i) in categories" :key="cat.label"
+            v-reveal="'scale'" :data-delay="i * 100">
+            <RouterLink :to="`/annonces?city=${cat.city}`" class="cat-card">
+              <div class="cat-img" :style="{ backgroundImage: `url(${cat.img})` }"></div>
+              <div class="cat-body">
+                <h3>{{ cat.label }}</h3>
+                <span>{{ cat.count }}</span>
+              </div>
+            </RouterLink>
           </div>
-        </div>
-        <div style="text-align:center;margin-top:40px">
-          <RouterLink to="/annonces" class="btn btn-primary btn-lg">
-            Voir les logements →
-          </RouterLink>
         </div>
       </div>
     </section>
@@ -155,6 +136,8 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import LetterReveal from '@/components/LetterReveal.vue'
+import CountUp from '@/components/CountUp.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -170,9 +153,9 @@ const slides = [
 ]
 
 const stats = [
-  { value: '500+', label: 'Logements disponibles' },
-  { value: '50+', label: 'Villes en France' },
-  { value: '10 000+', label: 'Étudiants satisfaits' },
+  { target: 500, suffix: '+', label: 'Logements disponibles' },
+  { target: 50,  suffix: '+', label: 'Villes en France' },
+  { target: 10000, suffix: '+', label: 'Étudiants satisfaits' },
 ]
 
 const categories = [
@@ -182,12 +165,6 @@ const categories = [
   { label: 'Bordeaux', city: 'Bordeaux', count: 'Nouvelle-Aquitaine', img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=300&h=200&fit=crop' },
 ]
 
-const steps = [
-  { icon: '🏠', title: 'Choisissez votre logement', desc: 'Parcourez nos annonces et trouvez le logement qui correspond à vos critères.' },
-  { icon: '📱', title: 'Faites votre demande', desc: 'Créez un compte et soumettez votre demande en quelques clics.' },
-  { icon: '📄', title: 'Envoyez vos justificatifs', desc: 'Téléchargez vos documents directement depuis votre espace personnel.' },
-  { icon: '🔑', title: 'Bienvenue chez vous !', desc: 'Emménagez et profitez de votre nouveau logement étudiant.' },
-]
 
 const perks = [
   { icon: '🔒', title: 'Logements 100% sécurisés', desc: 'Tous nos logements sont vérifiés et les propriétaires validés.' },
@@ -213,8 +190,8 @@ function goSearch({ city, maxPrice }) {
 
 onMounted(async () => {
   try {
-    const { data } = await listingService.getAll()
-    listings.value = data.slice(0, 6)
+    const { data } = await listingService.getAll({ limit: 6 })
+    listings.value = (data.listings ?? data).slice(0, 6)
   } catch { /* API non dispo */ }
   finally { loadingListings.value = false }
 
@@ -227,96 +204,5 @@ onUnmounted(() => clearInterval(slideTimer))
 </script>
 
 <style scoped>
-/* HERO */
-.hero { position: relative; height: 600px; display: flex; align-items: center; overflow: hidden; }
-.hero-slides { position: absolute; inset: 0; }
-.hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1s ease; }
-.hero-slide.active { opacity: 1; }
-.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(4,88,160,.85) 40%, rgba(4,88,160,.4)); }
-.hero-content { position: relative; z-index: 1; color: #fff; }
-.hero-badge { margin-bottom: 20px; }
-.hero-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
-.hero-title span { color: var(--accent); }
-.hero-subtitle { font-size: 1.1rem; opacity: .9; margin-bottom: 32px; max-width: 500px; }
-.hero-stats { display: flex; gap: 40px; margin-top: 32px; }
-.stat { display: flex; flex-direction: column; }
-.stat strong { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
-.stat span { font-size: .85rem; opacity: .8; }
-.hero-dots { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.4); border: none; cursor: pointer; transition: all .3s; }
-.dot.active { background: #fff; width: 24px; border-radius: 4px; }
-
-/* CATEGORIES */
-.categories-section { padding: 40px 0; }
-.categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.cat-card { border-radius: var(--radius); overflow: hidden; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; text-decoration: none; }
-.cat-img { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .4s ease; }
-.cat-card:hover .cat-img { transform: scale(1.06); }
-.cat-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.7) 40%, transparent); }
-.cat-body { position: relative; z-index: 1; padding: 16px; color: #fff; }
-.cat-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 2px; }
-.cat-body span { font-size: .78rem; opacity: .8; }
-
-/* HOW */
-.how-section { background: var(--bg); }
-.section-badge { color: var(--primary); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.section-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; }
-.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.step-card { background: var(--white); border-radius: var(--radius); padding: 32px 24px; text-align: center; position: relative; border: 1px solid var(--border); transition: all var(--transition); }
-.step-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
-.step-icon { font-size: 2.5rem; margin-bottom: 12px; }
-.step-num { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; }
-.step-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-.step-card p { font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
-
-/* LISTINGS */
-.listings-section { background: var(--white); }
-.empty-state { text-align: center; padding: 60px 0; }
-.empty-icon { font-size: 4rem; margin-bottom: 16px; }
-.empty-state p { color: var(--text-muted); margin-bottom: 24px; }
-
-/* REASSURANCE */
-.reassurance-section { background: var(--bg); }
-.reassurance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.reassurance-img { position: relative; }
-.reassurance-img img { border-radius: var(--radius); width: 100%; height: 480px; object-fit: cover; }
-.reassurance-badge { position: absolute; bottom: -20px; right: -20px; background: var(--primary); color: #fff; border-radius: var(--radius); padding: 20px 28px; text-align: center; box-shadow: var(--shadow-lg); }
-.reassurance-badge strong { display: block; font-size: 2rem; font-weight: 800; }
-.reassurance-badge span { font-size: .85rem; opacity: .9; }
-.perks { display: flex; flex-direction: column; gap: 20px; margin: 32px 0; }
-.perk { display: flex; gap: 16px; align-items: flex-start; }
-.perk-icon { font-size: 1.5rem; flex-shrink: 0; width: 44px; height: 44px; background: var(--primary-light); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
-.perk h4 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.perk p { font-size: .875rem; color: var(--text-muted); }
-
-/* FEATURES STRIP */
-.features-strip { background: var(--primary); padding: 24px 0; }
-.features-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-.feature { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 500; }
-.feature-icon { font-size: 1.2rem; }
-
-/* CTA BANNER */
-.cta-banner { background: linear-gradient(135deg, #0f172a 0%, var(--primary-dark) 100%); padding: 80px 0; color: #fff; }
-.cta-inner { display: flex; justify-content: space-between; align-items: center; gap: 40px; }
-.cta-inner h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-.cta-inner p { opacity: .8; }
-.cta-actions { display: flex; gap: 16px; flex-shrink: 0; }
-.btn-outline-white { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.5); }
-.btn-outline-white:hover { border-color: #fff; background: rgba(255,255,255,.1); }
-
-@media (max-width: 900px) {
-  .hero { height: 500px; }
-  .categories-grid { grid-template-columns: repeat(2, 1fr); }
-  .steps-grid { grid-template-columns: repeat(2, 1fr); }
-  .reassurance-grid { grid-template-columns: 1fr; gap: 40px; }
-  .reassurance-img { display: none; }
-  .cta-inner { flex-direction: column; text-align: center; }
-  .features-grid { justify-content: center; }
-}
-@media (max-width: 600px) {
-  .hero-stats { flex-direction: column; gap: 12px; }
-  .categories-grid, .steps-grid { grid-template-columns: 1fr; }
-  .cta-actions { flex-direction: column; width: 100%; }
-  .section-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
-}
+@import "../assets/css/home.css";
 </style>

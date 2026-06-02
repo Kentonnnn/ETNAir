@@ -81,6 +81,9 @@
               </div>
             </div>
           </div>
+
+          <!-- Reviews -->
+          <ReviewSection :listing-id="listing.id" />
         </div>
 
         <!-- Right: booking card -->
@@ -149,6 +152,7 @@ import { ref, computed, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
+import ReviewSection from '@/components/ReviewSection.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -208,51 +212,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.breadcrumb-bar { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 0; }
-.breadcrumb { font-size: .85rem; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
-.breadcrumb a { color: var(--primary); }
-.gallery { display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin: 32px 0; height: 420px; }
-.gallery-main { position: relative; border-radius: var(--radius); overflow: hidden; }
-.gallery-main img { width: 100%; height: 100%; object-fit: cover; }
-.gallery-badge { position: absolute; top: 16px; left: 16px; }
-.gallery-thumbs { display: flex; flex-direction: column; gap: 8px; }
-.gallery-thumbs img { border-radius: var(--radius-sm); width: 100%; flex: 1; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: border-color var(--transition); }
-.gallery-thumbs img.active, .gallery-thumbs img:hover { border-color: var(--primary); }
-.detail-grid { display: grid; grid-template-columns: 1fr 380px; gap: 48px; padding-bottom: 80px; }
-.listing-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.city-tag { font-size: .9rem; color: var(--text-muted); font-weight: 500; }
-.listing-title { font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 20px; }
-.price-mobile { display: none; margin-bottom: 20px; }
-.owner-card { display: flex; align-items: center; gap: 16px; background: var(--bg); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 32px; border: 1px solid var(--border); }
-.owner-avatar-lg { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; flex-shrink: 0; }
-.owner-name { font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.owner-label { font-size: .85rem; color: var(--text-muted); }
-.owner-label a { color: var(--primary); }
-.detail-section { margin-bottom: 40px; }
-.detail-section h2 { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-.detail-section p { color: var(--text-muted); line-height: 1.8; }
-.avail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.avail-item { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 18px; }
-.avail-label { display: block; font-size: .8rem; color: var(--text-muted); margin-bottom: 4px; }
-.avail-item strong { font-size: 1rem; color: var(--text); }
-.amenities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.amenity { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--text-muted); }
-.amenity span { color: var(--success); font-weight: 700; }
-/* Booking card */
-.booking-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-lg); height: fit-content; position: sticky; top: calc(var(--nav-h) + 24px); }
-.price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 24px; }
-.price-big { font-size: 2rem; font-weight: 800; color: var(--primary); }
-.price-unit { color: var(--text-muted); font-size: .95rem; }
-.date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px; }
-.date-field { padding: 12px; }
-.date-field label { display: block; font-size: .75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-.date-field input { border: none; padding: 0; font-size: .9rem; }
-.date-field input:focus { box-shadow: none; }
-.booking-total { background: var(--bg); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; }
-.total-row { display: flex; justify-content: space-between; font-size: .9rem; color: var(--text-muted); margin-bottom: 8px; }
-.total-final { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; color: var(--text); font-size: 1rem; }
-.booking-note { text-align: center; font-size: .8rem; color: var(--text-muted); margin-top: 12px; }
-.booking-login p { color: var(--text-muted); font-size: .9rem; text-align: center; margin-bottom: 16px; }
-@media (max-width: 1024px) { .detail-grid { grid-template-columns: 1fr; } .booking-card { position: static; } .price-mobile { display: flex; align-items: baseline; gap: 4px; } .booking-card .price-row { display: none; } }
-@media (max-width: 700px) { .gallery { grid-template-columns: 1fr; height: 300px; } .gallery-thumbs { display: none; } .avail-grid, .amenities { grid-template-columns: 1fr; } }
+@import "../assets/css/annonce-detail.css";
 </style>

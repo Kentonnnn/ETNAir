@@ -4,7 +4,9 @@ import { coverPage, uncoverPage } from '@/stores/pageTransition'
 
 const routes = [
   { path: '/',             name: 'Home',         component: () => import('@/views/HomeView.vue') },
-  { path: '/annonces',     name: 'Annonces',     component: () => import('@/views/AnnoncesView.vue') },
+  { path: '/annonces',         name: 'Annonces',    component: () => import('@/views/AnnoncesView.vue') },
+  { path: '/comment-reserver', name: 'HowItWorks', component: () => import('@/views/HowItWorksView.vue') },
+  { path: '/qui-sommes-nous',  name: 'About',      component: () => import('@/views/AboutView.vue') },
   { path: '/annonces/:id', name: 'AnnonceDetail',component: () => import('@/views/AnnonceDetailView.vue') },
   { path: '/login',        name: 'Login',        component: () => import('@/views/LoginView.vue'),        meta: { guest: true } },
   { path: '/register',     name: 'Register',     component: () => import('@/views/RegisterView.vue'),     meta: { guest: true } },

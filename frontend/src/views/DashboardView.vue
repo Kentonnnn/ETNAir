@@ -96,11 +96,20 @@
       <!-- Profile tab -->
       <div v-if="activeTab === 'profile'" class="profile-section">
         <div class="profile-card">
-          <div class="profile-avatar">{{ initials }}</div>
+          <div class="profile-avatar-edit" @click="$refs.picInput.click()" :title="pic ? 'Changer la photo' : 'Ajouter une photo'">
+            <img v-if="pic" :src="pic" alt="Photo de profil" />
+            <span v-else>{{ initials }}</span>
+            <div class="avatar-overlay"><span>📷</span></div>
+            <input ref="picInput" type="file" accept="image/*" style="display:none" @change="onPicChange" />
+          </div>
           <div class="profile-info">
             <h2>{{ auth.user?.firstName }} {{ auth.user?.lastName }}</h2>
             <p>{{ auth.user?.email }}</p>
             <span class="badge badge-primary">{{ roleLabel }}</span>
+            <div v-if="pic" class="avatar-actions">
+              <button class="btn btn-sm btn-outline" @click="$refs.picInput.click()">Changer la photo</button>
+              <button class="btn btn-sm" style="color:var(--danger);border:1px solid var(--danger)" @click="removePic">Supprimer</button>
+            </div>
           </div>
         </div>
         <div class="profile-fields">
@@ -133,9 +142,27 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
 import { listingService, userService, favoriteService } from '@/services/api'
+import { useProfilePic } from '@/stores/profilePic'
 
 const auth = useAuthStore()
 const favStore = useFavoritesStore()
+const { pic, setPic, removePic } = useProfilePic()
+
+function onPicChange(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (file.size > 2 * 1024 * 1024) {
+    showToast?.('Image trop lourde (max 2 Mo)', 'error')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = ev => {
+    setPic(ev.target.result)
+    showToast?.('Photo de profil mise à jour', 'success')
+  }
+  reader.readAsDataURL(file)
+  e.target.value = ''
+}
 const router = useRouter()
 const showToast = inject('showToast')
 
@@ -164,9 +191,16 @@ const statCards = computed(() => [
 ])
 
 const FALLBACK_IMGS = [
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=120&h=80&fit=crop',
   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=120&h=80&fit=crop',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=120&h=80&fit=crop',
+  'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=120&h=80&fit=crop',
 ]
 function getImg(l) {
   return l.images?.length
@@ -217,45 +251,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dash-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 48px 0 80px; }
-.dash-header-inner { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
-.dash-greeting { font-size: .95rem; opacity: .8; margin-bottom: 4px; }
-.dash-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
-.dash-sub { opacity: .75; }
-.dash-stats { display: flex; gap: 16px; flex-wrap: wrap; }
-.stat-card { background: rgba(255,255,255,.15); border-radius: var(--radius); padding: 20px 28px; display: flex; align-items: center; gap: 16px; backdrop-filter: blur(10px); }
-.stat-icon { font-size: 1.8rem; }
-.stat-card strong { display: block; font-size: 1.5rem; font-weight: 800; }
-.stat-card span { font-size: .85rem; opacity: .8; }
-.dash-body { margin-top: -40px; padding-bottom: 80px; }
-.tabs { display: flex; gap: 4px; background: var(--white); border-radius: var(--radius); padding: 6px; box-shadow: var(--shadow); margin-bottom: 32px; width: fit-content; }
-.tab { padding: 10px 20px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: var(--font); font-size: .9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all var(--transition); }
-.tab.active { background: var(--primary); color: #fff; }
-.empty-dash { text-align: center; padding: 80px 0; }
-.empty-dash .empty-icon { font-size: 4rem; margin-bottom: 16px; }
-.empty-dash h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-.empty-dash p { color: var(--text-muted); margin-bottom: 24px; }
-.dash-listings { display: flex; flex-direction: column; gap: 12px; }
-.dash-listing-row { display: flex; align-items: center; gap: 20px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; transition: box-shadow var(--transition); }
-.dash-listing-row:hover { box-shadow: var(--shadow); }
-.row-img { width: 90px; height: 70px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; }
-.row-info { flex: 1; }
-.row-info h3 { font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.row-city { font-size: .85rem; color: var(--text-muted); margin-bottom: 4px; }
-.row-price { font-size: .9rem; color: var(--text-muted); }
-.row-actions { display: flex; gap: 8px; }
-/* Profile */
-.profile-section { max-width: 600px; }
-.profile-card { display: flex; align-items: center; gap: 24px; background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 28px; margin-bottom: 24px; }
-.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; flex-shrink: 0; }
-.profile-info h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
-.profile-info p { color: var(--text-muted); font-size: .9rem; margin-bottom: 8px; }
-.profile-fields { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
-.field-row { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: .9rem; }
-.field-row:last-child { border-bottom: none; }
-.field-label { color: var(--text-muted); font-weight: 500; }
-.btn-danger { background: var(--danger); color: #fff; }
-.favorites-section { padding-bottom: 16px; }
-.fav-tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: .9rem; color: var(--text-muted); }
-@media (max-width: 700px) { .dash-header-inner { flex-direction: column; gap: 16px; } .dash-listing-row { flex-wrap: wrap; } .row-status { display: none; } }
+@import "../assets/css/dashboard.css";
 </style>

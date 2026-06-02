@@ -61,8 +61,10 @@
           </div>
         </div>
 
-        <!-- Loading -->
-        <div v-if="loading" class="page-loader"><div class="spinner"></div></div>
+        <!-- Loading skeleton -->
+        <div v-if="loading" :class="viewMode === 'grid' ? 'grid-3' : 'list-view'">
+          <SkeletonCard v-for="n in 6" :key="n" />
+        </div>
 
         <!-- Error -->
         <div v-else-if="error" class="alert alert-error">{{ error }}</div>
@@ -80,14 +82,20 @@
 
         <!-- Grid / List -->
         <div v-else :class="viewMode === 'grid' ? 'grid-3' : 'list-view'">
-          <ListingCard v-for="l in paginated" :key="l.id" :listing="l" />
+          <div v-for="(l, i) in paginated" :key="l.id"
+            v-reveal="'scale'" :data-delay="(i % 6) * 80">
+            <ListingCard :listing="l" />
+          </div>
         </div>
 
         <!-- Pagination -->
         <div class="pagination" v-if="totalPages > 1 && viewMode !== 'map'">
           <button class="page-btn" :disabled="page <= 1" @click="page--">← Précédent</button>
           <div class="page-nums">
-            <button v-for="p in totalPages" :key="p" :class="['page-num', { active: page === p }]" @click="page = p">{{ p }}</button>
+            <template v-for="(p, i) in visiblePages" :key="i">
+              <span v-if="p === '...'" class="page-ellipsis">…</span>
+              <button v-else :class="['page-num', { active: page === p }]" @click="page = p">{{ p }}</button>
+            </template>
           </div>
           <button class="page-btn" :disabled="page >= totalPages" @click="page++">Suivant →</button>
         </div>
@@ -103,6 +111,7 @@ import { useAuthStore } from '@/stores/auth'
 import { listingService } from '@/services/api'
 import SearchBar from '@/components/SearchBar.vue'
 import ListingCard from '@/components/ListingCard.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 import MapView from '@/components/MapView.vue'
 
 const route = useRoute()
@@ -130,6 +139,23 @@ const filtered = computed(() => {
 const totalPages = computed(() => Math.ceil(filtered.value.length / PER_PAGE))
 const paginated = computed(() => filtered.value.slice((page.value - 1) * PER_PAGE, page.value * PER_PAGE))
 
+// Compact pagination: 1 … (cur-1) cur (cur+1) … last
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const cur = page.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+
+  const pages = new Set([1, 2, total - 1, total, cur - 1, cur, cur + 1])
+  const sorted = [...pages].filter(p => p >= 1 && p <= total).sort((a, b) => a - b)
+
+  const result = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('...')
+    result.push(sorted[i])
+  }
+  return result
+})
+
 watch(filtered, () => { page.value = 1 })
 
 function applyFilters({ city, maxPrice } = {}) {
@@ -143,7 +169,7 @@ function resetFilters() {
 
 onMounted(async () => {
   try {
-    const { data } = await listingService.getAll()
+    const { data } = await listingService.getAll({ limit: 1000 })
     allListings.value = data.listings ?? data
   } catch (e) {
     error.value = 'Impossible de charger les annonces. Vérifiez que l\'API est démarrée.'
@@ -152,37 +178,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 60px 0 80px; }
-.page-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; }
-.page-header h1 span { color: var(--accent); }
-.page-header p { opacity: .85; margin-bottom: 32px; font-size: 1rem; }
-.page-body { display: grid; grid-template-columns: 260px 1fr; gap: 32px; margin-top: -40px; padding-bottom: 60px; align-items: start; }
-.filters { position: sticky; top: calc(var(--nav-h) + 20px); }
-.filter-panel { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 20px; }
-.filter-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; }
-.filter-group { margin-bottom: 20px; }
-.filter-label { display: block; font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-select.form-input { cursor: pointer; }
-.owner-cta { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); padding: 20px; text-align: center; }
-.owner-cta-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
-.owner-cta h4 { font-weight: 700; color: var(--primary); margin-bottom: 4px; font-size: .95rem; }
-.owner-cta p { font-size: .85rem; color: var(--text-muted); margin-bottom: 16px; }
-.results-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.results-count { font-size: .95rem; color: var(--text-muted); }
-.results-count strong { color: var(--text); font-weight: 700; }
-.view-toggle { display: flex; gap: 4px; }
-.view-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: 1rem; transition: all var(--transition); }
-.view-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.list-view { display: flex; flex-direction: column; gap: 16px; }
-.empty { text-align: center; padding: 80px 0; }
-.empty h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-.empty p { color: var(--text-muted); margin-bottom: 24px; }
-.pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 48px; }
-.page-btn { padding: 10px 20px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; font-family: var(--font); font-size: .9rem; transition: all var(--transition); }
-.page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
-.page-btn:disabled { opacity: .4; cursor: not-allowed; }
-.page-nums { display: flex; gap: 4px; }
-.page-num { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: .9rem; transition: all var(--transition); }
-.page-num.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-@media (max-width: 900px) { .page-body { grid-template-columns: 1fr; } .filters { position: static; } }
+@import "../assets/css/annonces.css";
 </style>

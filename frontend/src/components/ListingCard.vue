@@ -1,5 +1,5 @@
 <template>
-  <RouterLink :to="`/annonces/${listing.id}`" class="listing-card">
+  <RouterLink :to="`/annonces/${listing.id}`" class="listing-card" @mousemove="onTilt" @mouseleave="resetTilt" ref="cardEl">
     <!-- Image -->
     <div class="card-img">
       <img :src="imgUrl" :alt="listing.title" loading="lazy" @error="onImgError" />
@@ -40,17 +40,57 @@ import { ref, computed } from 'vue'
 import { useFavoritesStore } from '@/stores/favorites'
 import { useAuthStore } from '@/stores/auth'
 
+const cardEl = ref(null)
+
+function onTilt(e) {
+  const el = cardEl.value?.$el ?? cardEl.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  const x = (e.clientX - rect.left) / rect.width  - 0.5
+  const y = (e.clientY - rect.top)  / rect.height - 0.5
+  el.style.transform = `perspective(900px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) scale(1.03)`
+}
+
+function resetTilt() {
+  const el = cardEl.value?.$el ?? cardEl.value
+  if (el) el.style.transform = ''
+}
+
 const props = defineProps({ listing: { type: Object, required: true } })
 
 const auth = useAuthStore()
 const favStore = useFavoritesStore()
 
 const FALLBACK_IMGS = [
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=280&fit=crop',
+  // Modern apartments
   'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=280&fit=crop',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=280&fit=crop',
   'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=280&fit=crop',
+  // Cozy / Scandinavian
   'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=280&fit=crop',
+  // Studios / small spaces
+  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&h=280&fit=crop',
+  // Lofts / industrial
+  'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=400&h=280&fit=crop',
+  // Kitchens / dining
+  'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=400&h=280&fit=crop',
+  // Bedrooms
+  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=280&fit=crop',
+  // Living rooms
+  'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=280&fit=crop',
+  'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=280&fit=crop',
 ]
 const imgUrl = ref(
   props.listing.images?.length

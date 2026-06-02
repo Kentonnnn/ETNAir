@@ -11,8 +11,8 @@
   --accent-dark: #d4891a;
   --success: #27ae60;
   --danger: #e74c3c;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
+  --text: #111827;
+  --text-muted: #4b5563;
   --border: #e5e7eb;
   --bg: #f9fafb;
   --white: #ffffff;
@@ -26,29 +26,42 @@
   --transition: .2s ease;
 }
 
-/* ─── Dark theme — Sirnik aesthetic ─── */
+/* ─── Dark theme — Layered greys for depth ─── */
 [data-theme="dark"] {
   --primary: #ffffff;
   --primary-dark: #e8e8e8;
-  --primary-light: rgba(255,255,255,0.06);
+  --primary-light: rgba(255,255,255,0.08);
   --accent: #f5a623;
   --accent-dark: #d4891a;
   --success: #4ade80;
   --danger: #f87171;
   --text: #f5f5f7;
-  --text-muted: rgba(245,245,247,0.45);
-  --border: rgba(255,255,255,0.1);
-  --bg: #050505;
-  --white: #0a0a0a;
-  --shadow-sm: none;
-  --shadow: 0 0 0 1px rgba(255,255,255,0.06);
-  --shadow-lg: 0 0 0 1px rgba(255,255,255,0.08);
+  --text-muted: #9ca3af;
+  --border: #2a2a2e;
+  --bg: #18181b;       /* zinc-900 — base canvas */
+  --white: #27272a;    /* zinc-800 — surface 1 (cards) */
+  --surface-2: #3f3f46; /* zinc-700 — surface 2 (raised) */
+  --surface-3: #52525b; /* zinc-600 — hover / highlight */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow: 0 4px 12px rgba(0,0,0,.5);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.6);
 }
 
-[data-theme="dark"] body { background: #050505; }
+[data-theme="dark"] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(255,255,255,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255,255,255,0.02) 0%, transparent 60%),
+    #18181b;
+  background-attachment: fixed;
+}
 
 html { scroll-behavior: smooth; }
 body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* Hide native scrollbar — we use ScrollProgress instead */
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
@@ -148,8 +161,8 @@ button { cursor: pointer; font-family: var(--font); }
 [data-theme="dark"] .dash-listing-row,
 [data-theme="dark"] .create-form,
 [data-theme="dark"] .preview-card,
-[data-theme="dark"] .tips { background: #111; border-color: rgba(255,255,255,0.08); box-shadow: none; }
-[data-theme="dark"] .listing-card:hover { border-color: rgba(255,255,255,0.25); box-shadow: none; }
+[data-theme="dark"] .tips { background: var(--white); border-color: rgba(255,255,255,0.08); box-shadow: none; }
+[data-theme="dark"] .listing-card:hover { border-color: var(--surface-3); background: var(--surface-2); box-shadow: 0 12px 32px rgba(0,0,0,.6); }
 
 /* ── Dark mode — forms ── */
 [data-theme="dark"] .form-input { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--text); }
@@ -162,16 +175,18 @@ button { cursor: pointer; font-family: var(--font); }
 [data-theme="dark"] .badge-primary { background: rgba(255,255,255,0.08); color: #fff; }
 [data-theme="dark"] .badge-success { background: rgba(74,222,128,0.1); color: var(--success); }
 [data-theme="dark"] .badge-accent  { background: rgba(245,166,35,0.12); color: var(--accent); }
-[data-theme="dark"] .tabs { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); }
+[data-theme="dark"] .tabs { background: #1f1f23; border: 1px solid rgba(255,255,255,0.1); }
 [data-theme="dark"] .tab { color: rgba(255,255,255,0.4); }
 [data-theme="dark"] .tab.active { background: #fff; color: #000; }
 
 /* ── Dark mode — home sections ── */
 [data-theme="dark"] .perk-icon { background: rgba(255,255,255,0.06); }
-[data-theme="dark"] .features-strip { background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); }
-[data-theme="dark"] .cta-banner { background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .features-strip { background: #1f1f23 !important; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .features-strip .feature,
+[data-theme="dark"] .features-strip .feature span { color: rgba(255,255,255,0.85) !important; background: transparent !important; }
+[data-theme="dark"] .cta-banner { background: #1f1f23; border-top: 1px solid rgba(255,255,255,0.08); }
 [data-theme="dark"] .hero-overlay { background: linear-gradient(to right, rgba(5,5,5,.9) 40%, rgba(5,5,5,.55)); }
-[data-theme="dark"] .dash-header { background: #000; border-bottom: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .dash-header { background: #0d0d10; border-bottom: 1px solid rgba(255,255,255,0.08); }
 [data-theme="dark"] .toast { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); }
 [data-theme="dark"] .toast.success { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.3); color: var(--success); }
 [data-theme="dark"] .toast.error { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.3); color: var(--danger); }
@@ -179,3 +194,276 @@ button { cursor: pointer; font-family: var(--font); }
 /* ── Theme transition ── */
 *, *::before, *::after { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease; }
 .btn, .listing-card, .card { transition: all .25s cubic-bezier(.4,0,.2,1) !important; }
+
+/* ───────────────────────────────────────────
+   SCROLL REVEAL
+─────────────────────────────────────────── */
+.reveal-up    { opacity: 0; transform: translateY(48px);  transition: opacity .7s cubic-bezier(.2,.8,.3,1), transform .7s cubic-bezier(.2,.8,.3,1); }
+.reveal-left  { opacity: 0; transform: translateX(-60px); transition: opacity .7s cubic-bezier(.2,.8,.3,1), transform .7s cubic-bezier(.2,.8,.3,1); }
+.reveal-right { opacity: 0; transform: translateX(60px);  transition: opacity .7s cubic-bezier(.2,.8,.3,1), transform .7s cubic-bezier(.2,.8,.3,1); }
+.reveal-scale { opacity: 0; transform: scale(.88);        transition: opacity .7s cubic-bezier(.2,.8,.3,1), transform .7s cubic-bezier(.2,.8,.3,1); }
+.reveal-up.is-visible, .reveal-left.is-visible, .reveal-right.is-visible, .reveal-scale.is-visible {
+  opacity: 1 !important; transform: none !important;
+}
+
+/* ───────────────────────────────────────────
+   GRADIENT TEXT
+─────────────────────────────────────────── */
+/* Gradient text: works only on plain text (no per-letter children).
+   For LetterReveal text, use solid colors via .accent-text instead. */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 50%, var(--accent) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+[data-theme="dark"] .gradient-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #fbbf24 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ───────────────────────────────────────────
+   3D CARD TILT
+─────────────────────────────────────────── */
+.listing-card { transform-style: preserve-3d; will-change: transform; }
+.listing-card .card-img img { transition: transform .4s ease; }
+
+/* ───────────────────────────────────────────
+   MAGNETIC BUTTON — override transform
+─────────────────────────────────────────── */
+.btn { --mag-x: 0px; --mag-y: 0px; }
+
+/* ───────────────────────────────────────────
+   FLOATING ANIMATION (for hero badge)
+─────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+
+/* ───────────────────────────────────────────
+   GLOW PULSE (dark mode accents)
+─────────────────────────────────────────── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(96,165,250,.2); }
+  50%       { box-shadow: 0 0 40px rgba(96,165,250,.5); }
+}
+[data-theme="dark"] .btn-primary { animation: glow-pulse 3s ease-in-out infinite; }
+[data-theme="dark"] .btn-primary:hover { animation: none; }
+
+/* ───────────────────────────────────────────
+   CONTRAST & BACKGROUND ISOLATION FIXES
+─────────────────────────────────────────── */
+
+/* Every routed page gets its own background so colored sections
+   from other pages can't bleed through during transitions */
+.home, .annonces-page, .detail-page, .create-page,
+.dashboard, .fav-page, .login-page, .register-page {
+  background: var(--bg);
+  position: relative;
+  z-index: 1;
+}
+
+/* Light mode: features-strip text must stay white on blue bg */
+.features-strip .feature { color: #fff; }
+.features-strip .feature-icon { color: #fff; }
+
+/* Light mode: hero text */
+.hero-content { color: #fff; }
+.hero-content .section-badge .badge { background: rgba(255,255,255,.15); color: #fff; }
+
+/* Improve link contrast in cards */
+.card-body a, .listing-card .card-city { color: var(--text-muted); }
+
+/* Booking card contrast fixes */
+.booking-card { background: var(--white) !important; }
+.date-field input { background: transparent; color: var(--text); }
+
+/* Dark mode: section backgrounds for contrast */
+[data-theme="dark"] .annonces-page,
+[data-theme="dark"] .detail-page,
+[data-theme="dark"] .create-page,
+[data-theme="dark"] .dashboard,
+[data-theme="dark"] .fav-page { background: var(--bg); }
+
+[data-theme="dark"] .owner-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .avail-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .booking-card { background: var(--white) !important; border-color: rgba(255,255,255,0.1) !important; }
+[data-theme="dark"] .booking-total { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .date-range { border-color: rgba(255,255,255,0.1); }
+[data-theme="dark"] .filter-panel { background: var(--white); border: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .owner-cta { background: var(--white); border: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .page-header { background: #0d0d10; }
+
+/* Breadcrumb contrast */
+[data-theme="dark"] .breadcrumb-bar { background: #1f1f23; border-bottom-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .breadcrumb a { color: var(--primary); }
+
+/* Detail section borders */
+[data-theme="dark"] .detail-section h2 { border-bottom-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .total-final { border-top-color: rgba(255,255,255,0.08); }
+
+/* Text-muted must always be readable */
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .section-subtitle,
+[data-theme="dark"] .card-desc,
+[data-theme="dark"] .row-city,
+[data-theme="dark"] .row-price { color: #9ca3af; }
+
+/* Amenities icon contrast in dark */
+[data-theme="dark"] .amenity span { color: var(--success); }
+[data-theme="dark"] .amenity { color: #d1d5db; }
+
+/* ───────────────────────────────────────────
+   DARK MODE — fix white-on-white invisibility
+   (--primary is #fff in dark, so any
+    "background:var(--primary); color:#fff"
+    becomes invisible without these overrides)
+─────────────────────────────────────────── */
+
+/* Pagination */
+[data-theme="dark"] .page-btn { background: var(--white); border-color: rgba(255,255,255,0.1); color: var(--text); }
+[data-theme="dark"] .page-btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--surface-3); color: #fff; }
+[data-theme="dark"] .page-num { background: var(--white); border-color: rgba(255,255,255,0.1); color: var(--text); }
+[data-theme="dark"] .page-num:hover { background: var(--surface-2); border-color: var(--surface-3); }
+[data-theme="dark"] .page-num.active { background: #fff; color: #000; border-color: #fff; }
+
+/* View toggle (Grille / Liste / Carte) */
+[data-theme="dark"] .view-btn { background: var(--white); border-color: rgba(255,255,255,0.1); color: var(--text); }
+[data-theme="dark"] .view-btn:hover { background: var(--surface-2); border-color: var(--surface-3); }
+[data-theme="dark"] .view-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+/* Step numbers, avatars — any circle that used primary bg + white text */
+[data-theme="dark"] .step-num,
+[data-theme="dark"] .user-avatar,
+[data-theme="dark"] .owner-avatar,
+[data-theme="dark"] .owner-avatar-lg,
+[data-theme="dark"] .profile-avatar { background: #fff; color: #000; }
+
+/* Cards & content backgrounds with primary bg */
+[data-theme="dark"] .perk-icon { color: #fff; }
+[data-theme="dark"] .step-icon { color: #fff; }
+
+/* Reassurance/CTA/category cards overlays — these have dark gradients already, ok */
+
+/* Owner-cta button block */
+[data-theme="dark"] .owner-cta h4 { color: #fff; }
+[data-theme="dark"] .owner-cta p { color: #9ca3af; }
+
+/* Filter panel */
+[data-theme="dark"] .filter-title { color: #fff; }
+[data-theme="dark"] .filter-label { color: #d1d5db; }
+
+/* Results count */
+[data-theme="dark"] .results-count { color: #9ca3af; }
+[data-theme="dark"] .results-count strong { color: #fff; }
+
+/* Empty state */
+[data-theme="dark"] .empty h3, [data-theme="dark"] .empty-dash h3 { color: #fff; }
+
+/* Listing card body in dark */
+[data-theme="dark"] .card-title, [data-theme="dark"] .listing-card .card-title { color: #fff; }
+[data-theme="dark"] .card-city { color: #9ca3af; }
+[data-theme="dark"] .price-amount { color: #fff; }
+[data-theme="dark"] .card-dates { background: rgba(255,255,255,0.04); color: #9ca3af; }
+
+/* Hero stats — number color */
+[data-theme="dark"] .stat strong { color: #fff; }
+
+/* Section titles */
+[data-theme="dark"] .section-title { color: #fff; }
+[data-theme="dark"] .section-title span { color: var(--accent); }
+
+/* FAQ items (about / how-it-works pages) */
+[data-theme="dark"] .faq-item { background: var(--white); border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .faq-q { color: #fff; }
+
+/* Step cards content */
+[data-theme="dark"] .step-card h3 { color: #fff; }
+[data-theme="dark"] .step-card p { color: #9ca3af; }
+
+/* Detail page */
+[data-theme="dark"] .listing-title { color: #fff; }
+[data-theme="dark"] .listing-meta .city-tag { color: #9ca3af; }
+[data-theme="dark"] .price-big { color: #fff; }
+[data-theme="dark"] .avail-item strong { color: #fff; }
+[data-theme="dark"] .avail-label { color: #9ca3af; }
+[data-theme="dark"] .owner-name { color: #fff; }
+[data-theme="dark"] .owner-label { color: #9ca3af; }
+[data-theme="dark"] .detail-section h2 { color: #fff; }
+[data-theme="dark"] .detail-section p { color: #9ca3af; }
+[data-theme="dark"] .booking-note { color: #9ca3af; }
+
+/* Dashboard */
+[data-theme="dark"] .dash-greeting { color: #9ca3af; }
+[data-theme="dark"] .dash-sub { color: #9ca3af; }
+[data-theme="dark"] .row-info h3 { color: #fff; }
+[data-theme="dark"] .profile-info h2 { color: #fff; }
+[data-theme="dark"] .profile-info p { color: #9ca3af; }
+[data-theme="dark"] .field-label { color: #9ca3af; }
+[data-theme="dark"] .field-row { color: #fff; }
+[data-theme="dark"] .field-row { border-bottom-color: rgba(255,255,255,0.08); }
+
+/* Owner-card */
+[data-theme="dark"] .owner-name { color: #fff; }
+
+/* Forms */
+[data-theme="dark"] .form-label { color: #fff; }
+
+/* Create/Edit form */
+[data-theme="dark"] .form-section-title { color: #fff; }
+[data-theme="dark"] .char-count { color: #9ca3af; }
+[data-theme="dark"] .dropzone { border-color: rgba(255,255,255,0.15); color: #9ca3af; }
+[data-theme="dark"] .dropzone:hover { border-color: #fff; color: #fff; }
+
+/* Preview area */
+[data-theme="dark"] .preview-title { color: #fff; }
+[data-theme="dark"] .preview-city { color: #9ca3af; }
+[data-theme="dark"] .preview-name { color: #fff; }
+[data-theme="dark"] .preview-desc { color: #9ca3af; }
+[data-theme="dark"] .preview-price { color: #9ca3af; }
+[data-theme="dark"] .preview-price strong { color: #fff; }
+[data-theme="dark"] .tips h4 { color: #fff; }
+[data-theme="dark"] .tips li { color: #9ca3af; }
+
+/* Favorites page */
+[data-theme="dark"] .fav-header { background: #0d0d10; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+/* About page */
+[data-theme="dark"] .team-title { color: #fff; }
+[data-theme="dark"] .team-text { color: #9ca3af; }
+[data-theme="dark"] .portrait-info strong { color: #fff; }
+[data-theme="dark"] .portrait-info span { color: #9ca3af; }
+[data-theme="dark"] .stat-value { color: #fff; }
+[data-theme="dark"] .stat-label { color: #9ca3af; }
+[data-theme="dark"] .mission-section { background: #1f1f23; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .mission-title { color: #fff; }
+[data-theme="dark"] .value-item h4 { color: #fff; }
+[data-theme="dark"] .value-item p { color: #9ca3af; }
+[data-theme="dark"] blockquote { color: #fff; }
+[data-theme="dark"] .quote-mark { color: #fff; }
+[data-theme="dark"] .quote-author { color: #9ca3af; }
+[data-theme="dark"] .about-cta h2 { color: #fff; }
+[data-theme="dark"] .about-cta p { color: #9ca3af; }
+
+/* How-it-works page */
+[data-theme="dark"] .faq-a { color: #9ca3af; }
+
+/* Gradient headers in dark mode → pure black for Sirnik aesthetic */
+[data-theme="dark"] .how-header,
+[data-theme="dark"] .page-header,
+[data-theme="dark"] .create-header,
+[data-theme="dark"] .dash-header { background: #0d0d10 !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+[data-theme="dark"] .how-cta,
+[data-theme="dark"] .cta-banner { background: #1f1f23 !important; border: 1px solid rgba(255,255,255,0.08); }
