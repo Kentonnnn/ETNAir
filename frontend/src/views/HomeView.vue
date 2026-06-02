@@ -10,7 +10,7 @@
       <div class="hero-overlay"></div>
       <div class="container hero-content">
         <div class="hero-badge">
-          <span class="badge badge-accent">✈ Plateforme de location étudiante</span>
+          <span class="badge badge-accent">✈ Plateforme de location de logements</span>
         </div>
         <h1 class="hero-title">
           <LetterReveal text="Trouvez votre" :delay="200" /><br>
@@ -85,7 +85,7 @@
           </div>
           <div class="reassurance-content">
             <p class="section-badge">Pourquoi ETNAir ?</p>
-            <h2 class="section-title">Une résidence étudiante<br>sans renoncer au <span>confort</span></h2>
+            <h2 class="section-title">Un logement moderne<br>sans renoncer au <span>confort</span></h2>
             <div class="perks">
               <div class="perk" v-for="p in perks" :key="p.title">
                 <div class="perk-icon">{{ p.icon }}</div>
@@ -118,7 +118,7 @@
       <div class="container cta-inner">
         <div>
           <h2>Vous êtes propriétaire ?</h2>
-          <p>Publiez gratuitement vos annonces et touchez des milliers d'étudiants.</p>
+          <p>Publiez gratuitement vos annonces et touchez des milliers de personnes.</p>
         </div>
         <div class="cta-actions">
           <RouterLink to="/register" class="btn btn-white btn-lg">Déposer une annonce</RouterLink>
@@ -155,7 +155,7 @@ const slides = [
 const stats = [
   { target: 500, suffix: '+', label: 'Logements disponibles' },
   { target: 50,  suffix: '+', label: 'Villes en France' },
-  { target: 10000, suffix: '+', label: 'Étudiants satisfaits' },
+  { target: 10000, suffix: '+', label: 'Utilisateurs satisfaits' },
 ]
 
 const categories = [
@@ -169,7 +169,7 @@ const categories = [
 const perks = [
   { icon: '🔒', title: 'Logements 100% sécurisés', desc: 'Tous nos logements sont vérifiés et les propriétaires validés.' },
   { icon: '⚡', title: 'Réservation ultra-rapide', desc: 'Moins de 5 minutes pour soumettre votre demande.' },
-  { icon: '🤝', title: 'Communauté étudiante', desc: 'Rejoignez des milliers d\'étudiants dans toute la France.' },
+  { icon: '🤝', title: 'Communauté dynamique', desc: 'Rejoignez des milliers d\'utilisateurs partout en France.' },
 ]
 
 const features = [

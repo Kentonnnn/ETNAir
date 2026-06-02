@@ -16,7 +16,7 @@
       <div class="auth-card">
         <RouterLink to="/" class="back-link">← Retour à l'accueil</RouterLink>
         <h1>Créer un compte</h1>
-        <p class="auth-subtitle">Rejoignez des milliers d'étudiants sur ETNAir !</p>
+        <p class="auth-subtitle">Rejoignez des milliers d'utilisateurs sur ETNAir !</p>
 
         <div v-if="auth.error" class="alert alert-error">{{ auth.error }}</div>
 

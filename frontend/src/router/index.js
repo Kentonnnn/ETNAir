@@ -24,20 +24,26 @@ const router = createRouter({
 })
 
 let isFirstNavigation = true
+let transitionTriggered = false
 
 router.beforeEach(async (to, from) => {
   const auth = useAuthStore()
   if (to.meta.auth && !auth.isLoggedIn) return { name: 'Login' }
   if (to.meta.guest && auth.isLoggedIn) return { name: 'Home' }
 
-  if (!isFirstNavigation && from.name) {
+  transitionTriggered = false
+  if (!isFirstNavigation && from.name && to.path !== from.path) {
+    transitionTriggered = true
     await coverPage()
   }
   isFirstNavigation = false
 })
 
 router.afterEach(() => {
-  uncoverPage()
+  if (transitionTriggered) {
+    uncoverPage()
+    transitionTriggered = false
+  }
 })
 
 export default router

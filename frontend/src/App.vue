@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <AppNav />
+    <InitialSplash v-if="showInitialSplash" @hide="showInitialSplash = false" />
     <main class="app-main">
       <RouterView />
     </main>
@@ -15,9 +16,10 @@
 </template>
 
 <script setup>
-import { reactive, provide } from 'vue'
+import { reactive, provide, ref } from 'vue'
 import AppNav from '@/components/AppNav.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import InitialSplash from '@/components/InitialSplash.vue'
 import PageVolet from '@/components/PageVolet.vue'
 import CustomCursor from '@/components/CustomCursor.vue'
 import ScrollProgress from '@/components/ScrollProgress.vue'
@@ -25,6 +27,7 @@ import { useThemeStore } from '@/stores/theme'
 
 useThemeStore()
 
+const showInitialSplash = ref(true)
 const toast = reactive({ visible: false, message: '', type: 'success' })
 let toastTimer = null
 

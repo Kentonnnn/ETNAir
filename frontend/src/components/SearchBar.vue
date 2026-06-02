@@ -41,5 +41,7 @@ function handleSearch() {
 .search-divider { width: 1px; height: 28px; background: var(--border); margin: 0 12px; flex-shrink: 0; }
 .search-btn { display: flex; align-items: center; gap: 6px; background: var(--primary); color: #fff; border: none; padding: 14px 24px; border-radius: 50px; font-family: var(--font); font-size: .95rem; font-weight: 600; cursor: pointer; transition: all var(--transition); white-space: nowrap; flex-shrink: 0; }
 .search-btn:hover { background: var(--primary-dark); transform: scale(1.02); }
+[data-theme="dark"] .search-btn { color: #18181b; }
+[data-theme="dark"] .search-btn:hover { color: #18181b; }
 @media (max-width: 600px) { .search-bar { flex-direction: column; border-radius: var(--radius); padding: 16px; gap: 12px; } .search-divider { display: none; } .search-btn { width: 100%; justify-content: center; } }
 </style>

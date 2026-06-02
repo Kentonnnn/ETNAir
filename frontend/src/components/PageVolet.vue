@@ -1,5 +1,5 @@
 <template>
-  <div class="volet" :class="phase">
+  <div class="volet" :class="phase" :style="{ background: theme.dark ? '#0f172a' : '#0b67ff' }">
     <div class="volet-inner">
       <div v-if="!loaded && (phase === 'covering' || phase === 'covered')" class="volet-fallback">
         <div class="spinner" style="width:40px;height:40px;border-width:4px"></div>
@@ -12,7 +12,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { voletPhase as phase } from '@/stores/pageTransition'
+import { useThemeStore } from '@/stores/theme'
 import lottie from 'lottie-web'
+
+const theme = useThemeStore()
 
 const lottieContainer = ref(null)
 const loaded = ref(false)
@@ -71,7 +74,6 @@ onBeforeUnmount(() => {
 .volet {
   position: fixed;
   inset: 0;
-  /* loader background: change to blue */
   background: #0b67ff;
   z-index: 9999;
   transform: translateX(-100%);
