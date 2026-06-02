@@ -3,8 +3,11 @@
     <div class="container nav-inner">
       <!-- Logo -->
       <RouterLink to="/" class="logo">
-        <span class="logo-icon">✈</span>
-        <span class="logo-text">ETN<strong>Air</strong></span>
+        <img v-if="showLogoImage" class="logo-img" src="/logo.png" alt="ETNAir logo" @error="showLogoImage = false" />
+        <template v-else>
+          <span class="logo-icon">✈</span>
+          <span class="logo-text">ETN<strong>Air</strong></span>
+        </template>
       </RouterLink>
 
       <!-- Desktop nav -->
@@ -75,6 +78,7 @@ const { pic: profilePic } = useProfilePic()
 const router = useRouter()
 const isScrolled = ref(false)
 const menuOpen = ref(false)
+const showLogoImage = ref(true)
 
 const initials = computed(() => {
   if (!auth.user) return ''
@@ -107,6 +111,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .navbar.scrolled { box-shadow: var(--shadow); border-color: var(--border); }
 .nav-inner { display: flex; align-items: center; gap: 32px; height: 100%; }
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+.logo-img { height: 40px; width: auto; }
 .logo-icon { font-size: 1.4rem; }
 .logo-text { font-size: 1.3rem; font-weight: 500; color: var(--text); }
 .logo-text strong { color: var(--primary); font-weight: 800; }

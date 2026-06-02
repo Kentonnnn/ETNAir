@@ -4,10 +4,9 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="logo">
-            <span class="logo-icon">✈</span>
-            <span class="logo-text">ETN<strong>Air</strong></span>
+            <img class="logo-img" src="/logo.png" alt="ETNAir logo" />
           </div>
-          <p>La plateforme de location de logements étudiants. Simple, rapide, sécurisé.</p>
+          <p>Plateforme de location de logements simple, rapide et sécurisée.</p>
           <div class="socials">
             <a href="#" class="social-btn">f</a>
             <a href="#" class="social-btn">in</a>
@@ -52,7 +51,8 @@
 <style scoped>
 .footer { background: #0f172a; color: #94a3b8; padding: 64px 0 32px; margin-top: 80px; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
-.footer-brand .logo { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.footer-brand .logo { display: flex; align-items: flex-start; margin-bottom: 20px; }
+.footer-brand .logo-img { height: 72px; width: auto; }
 .footer-brand .logo-icon { font-size: 1.3rem; }
 .footer-brand .logo-text { font-size: 1.2rem; font-weight: 600; color: #fff; }
 .footer-brand .logo-text strong { color: #60a5fa; }
