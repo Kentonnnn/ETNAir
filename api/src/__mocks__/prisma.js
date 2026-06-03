@@ -27,5 +27,13 @@ export const prisma = {
     create:    jest.fn(),
     deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
   },
+  booking: {
+    findFirst:  jest.fn(),
+    findUnique: jest.fn(),
+    findMany:   jest.fn(),
+    create:     jest.fn(),
+    update:     jest.fn(),
+    deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+  },
   $disconnect: jest.fn().mockResolvedValue(undefined),
 }

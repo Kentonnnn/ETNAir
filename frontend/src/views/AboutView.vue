@@ -7,7 +7,7 @@
           <div class="quote-block" v-reveal="'left'">
             <span class="quote-mark">"</span>
             <blockquote>
-              Notre travail n'a de sens que s'il est un témoignage fidèle de son temps.
+              Un grand pouvoir implique de grandes responsabilités.
             </blockquote>
             <p class="quote-author">— Équipe ETNAir, Fondateurs</p>
             <span class="quote-mark closing">"</span>
