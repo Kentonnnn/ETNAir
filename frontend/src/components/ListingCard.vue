@@ -125,8 +125,10 @@ const ownerInitials = computed(() => {
 .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .listing-card:hover .card-img img { transform: scale(1.06); }
 .card-badge { position: absolute; top: 12px; left: 12px; }
-.fav-btn { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.9); border: none; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition); color: #ccc; }
+.fav-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.95); border: none; font-size: 1.4rem; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition); color: #1a1a2e; box-shadow: 0 2px 8px rgba(0,0,0,.15); font-weight: 700; }
 .fav-btn:hover, .fav-btn.active { color: #e74c3c; background: #fff; transform: scale(1.1); }
+:global([data-theme="dark"]) .fav-btn { color: #1a1a2e; background: #fff; }
+:global([data-theme="dark"]) .fav-btn:hover, :global([data-theme="dark"]) .fav-btn.active { color: #e74c3c; }
 .card-body { padding: 16px; }
 .card-city { font-size: .8rem; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
 .card-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }

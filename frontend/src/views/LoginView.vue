@@ -3,7 +3,6 @@
     <div class="auth-visual">
       <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&h=900&fit=crop" alt="Logement" />
       <div class="visual-overlay">
-        <div class="visual-logo">✈ ETN<strong>Air</strong></div>
         <blockquote>"Trouver un logement n'a jamais été aussi simple."</blockquote>
       </div>
     </div>
@@ -46,10 +45,6 @@
         </p>
 
         <!-- Demo credentials -->
-        <div class="demo-box">
-          <p class="demo-title">🧪 Compte de test</p>
-          <p>Créez d'abord un compte via <RouterLink to="/register">l'inscription</RouterLink>, ou utilisez l'API Swagger pour en créer un.</p>
-        </div>
       </div>
     </div>
   </div>

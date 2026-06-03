@@ -10,7 +10,6 @@
       <div v-if="toast.visible" :class="['toast', toast.type]">{{ toast.message }}</div>
     </Transition>
     <PageVolet />
-    <CustomCursor />
     <ScrollProgress />
   </div>
 </template>
@@ -21,7 +20,6 @@ import AppNav from '@/components/AppNav.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import InitialSplash from '@/components/InitialSplash.vue'
 import PageVolet from '@/components/PageVolet.vue'
-import CustomCursor from '@/components/CustomCursor.vue'
 import ScrollProgress from '@/components/ScrollProgress.vue'
 import { useThemeStore } from '@/stores/theme'
 

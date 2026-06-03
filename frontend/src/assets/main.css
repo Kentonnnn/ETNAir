@@ -96,7 +96,7 @@ button { cursor: pointer; font-family: var(--font); }
 /* ── Badge ── */
 .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
 .badge-primary { background: var(--primary-light); color: var(--primary); }
-.badge-success { background: #dcfce7; color: var(--success); }
+.badge-success { background: #047857; color: #fff; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
 .badge-accent { background: #fef3c7; color: var(--accent-dark); }
 
 /* ── Form ── */
@@ -173,11 +173,12 @@ button { cursor: pointer; font-family: var(--font); }
 
 /* ── Dark mode — badges & tabs ── */
 [data-theme="dark"] .badge-primary { background: rgba(255,255,255,0.08); color: #fff; }
-[data-theme="dark"] .badge-success { background: rgba(74,222,128,0.1); color: var(--success); }
+[data-theme="dark"] .badge-success { background: #065f46; color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
 [data-theme="dark"] .badge-accent  { background: rgba(245,166,35,0.12); color: var(--accent); }
-[data-theme="dark"] .tabs { background: #1f1f23; border: 1px solid rgba(255,255,255,0.1); }
-[data-theme="dark"] .tab { color: rgba(255,255,255,0.4); }
-[data-theme="dark"] .tab.active { background: #fff; color: #000; }
+[data-theme="dark"] .tabs { background: #1f1f23 !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+[data-theme="dark"] .tab { color: rgba(255,255,255,0.6) !important; background: transparent !important; }
+[data-theme="dark"] .tab.active { background: #fff !important; color: #000 !important; }
+[data-theme="dark"] .tab.active * { color: #000 !important; }
 
 /* ── Dark mode — home sections ── */
 [data-theme="dark"] .perk-icon { background: rgba(255,255,255,0.06); }
@@ -299,7 +300,29 @@ button { cursor: pointer; font-family: var(--font); }
 
 [data-theme="dark"] .owner-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 [data-theme="dark"] .avail-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
-[data-theme="dark"] .booking-card { background: var(--white) !important; border-color: rgba(255,255,255,0.1) !important; }
+/* Dark mode: keep booking card light w/ BLACK text for readability */
+[data-theme="dark"] .booking-card { background: #fff !important; border-color: #e5e7eb !important; color: #111 !important; }
+[data-theme="dark"] .booking-card *,
+[data-theme="dark"] .booking-card h2,
+[data-theme="dark"] .booking-card h3,
+[data-theme="dark"] .booking-card label,
+[data-theme="dark"] .booking-card span,
+[data-theme="dark"] .booking-card strong,
+[data-theme="dark"] .booking-card p { color: #111 !important; }
+[data-theme="dark"] .booking-card .price-big { color: #0458a0 !important; }
+[data-theme="dark"] .booking-card .price-unit,
+[data-theme="dark"] .booking-card .total-row,
+[data-theme="dark"] .booking-card .booking-note,
+[data-theme="dark"] .booking-card .booking-login p,
+[data-theme="dark"] .booking-card .date-field label,
+[data-theme="dark"] .booking-card .booking-total { color: #6b7280 !important; }
+[data-theme="dark"] .booking-card .booking-total { background: #f9fafb !important; }
+[data-theme="dark"] .booking-card .date-range { border-color: #e5e7eb !important; }
+[data-theme="dark"] .booking-card input,
+[data-theme="dark"] .booking-card .date-field input { color: #111 !important; background: #fff !important; }
+[data-theme="dark"] .booking-card .total-final { border-top-color: #e5e7eb !important; color: #111 !important; }
+[data-theme="dark"] .booking-card .btn-primary { background: #0458a0 !important; color: #fff !important; }
+[data-theme="dark"] .booking-card .btn-primary:hover { background: #034080 !important; }
 [data-theme="dark"] .booking-total { background: rgba(255,255,255,0.04); }
 [data-theme="dark"] .date-range { border-color: rgba(255,255,255,0.1); }
 [data-theme="dark"] .filter-panel { background: var(--white); border: 1px solid rgba(255,255,255,0.08); }
@@ -349,7 +372,8 @@ button { cursor: pointer; font-family: var(--font); }
 [data-theme="dark"] .user-avatar,
 [data-theme="dark"] .owner-avatar,
 [data-theme="dark"] .owner-avatar-lg,
-[data-theme="dark"] .profile-avatar { background: #fff; color: #000; }
+[data-theme="dark"] .profile-avatar { background: #fff !important; color: #000 !important; }
+[data-theme="dark"] .step-num { font-weight: 800 !important; }
 
 /* Cards & content backgrounds with primary bg */
 [data-theme="dark"] .perk-icon { color: #fff; }
