@@ -15,10 +15,21 @@
 
         <div v-if="auth.error" class="alert alert-error">{{ auth.error }}</div>
 
-        <form @submit.prevent="handleLogin">
+        <form @submit.prevent="handleLogin" novalidate>
           <div class="form-group">
             <label class="form-label">Adresse email</label>
-            <input v-model="form.email" type="email" class="form-input" placeholder="vous@exemple.fr" required />
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-input"
+              :class="{ 'input-error': emailTouched && !emailValid }"
+              placeholder="vous@exemple.fr"
+              @blur="emailTouched = true"
+              required
+            />
+            <span v-if="emailTouched && !emailValid" class="form-error">
+              Veuillez entrer une adresse email valide (ex: nom@domaine.fr)
+            </span>
           </div>
           <div class="form-group">
             <label class="form-label">
@@ -31,7 +42,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block btn-lg" :disabled="auth.loading">
+          <button type="submit" class="btn btn-primary btn-block btn-lg" :disabled="auth.loading || !canSubmit">
             <span v-if="auth.loading" class="spinner" style="width:18px;height:18px;border-width:2px"></span>
             <span v-else>Se connecter</span>
           </button>
@@ -51,16 +62,23 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
 const showPwd = ref(false)
+const emailTouched = ref(false)
 const form = reactive({ email: '', password: '' })
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const emailValid = computed(() => EMAIL_REGEX.test(form.email.trim()))
+const canSubmit = computed(() => emailValid.value && form.password.length > 0)
+
 async function handleLogin() {
+  emailTouched.value = true
+  if (!emailValid.value) return
   auth.error = null
   const ok = await auth.login(form.email, form.password)
   if (ok) router.push('/dashboard')

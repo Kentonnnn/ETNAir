@@ -20,7 +20,7 @@
 
         <div v-if="auth.error" class="alert alert-error">{{ auth.error }}</div>
 
-        <form @submit.prevent="handleRegister">
+        <form @submit.prevent="handleRegister" novalidate>
           <div class="name-row">
             <div class="form-group">
               <label class="form-label">Prénom</label>
@@ -34,7 +34,18 @@
 
           <div class="form-group">
             <label class="form-label">Adresse email</label>
-            <input v-model="form.email" type="email" class="form-input" placeholder="vous@exemple.fr" required />
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-input"
+              :class="{ 'input-error': emailTouched && !emailValid }"
+              placeholder="vous@exemple.fr"
+              @blur="emailTouched = true"
+              required
+            />
+            <span v-if="emailTouched && !emailValid" class="form-error">
+              Veuillez entrer une adresse email valide (ex: nom@domaine.fr)
+            </span>
           </div>
 
           <div class="form-group">
@@ -62,7 +73,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block btn-lg" :disabled="auth.loading">
+          <button type="submit" class="btn btn-primary btn-block btn-lg" :disabled="auth.loading || !canSubmit">
             <span v-if="auth.loading" class="spinner" style="width:18px;height:18px;border-width:2px"></span>
             <span v-else>Créer mon compte</span>
           </button>
@@ -89,7 +100,17 @@ import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
 const router = useRouter()
 const showPwd = ref(false)
+const emailTouched = ref(false)
 const form = reactive({ firstName: '', lastName: '', email: '', password: '', role: 'tenant' })
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const emailValid = computed(() => EMAIL_REGEX.test(form.email.trim()))
+const canSubmit = computed(() =>
+  emailValid.value
+  && form.firstName.trim().length > 0
+  && form.lastName.trim().length > 0
+  && form.password.length >= 8
+)
 
 const features = ['Inscription gratuite', 'Milliers d\'annonces', 'Propriétaires vérifiés', 'Réservation rapide']
 
@@ -108,6 +129,8 @@ const strengthClass = computed(() => ['', 'weak', 'fair', 'good', 'strong'][stre
 const strengthLabel = computed(() => ['', 'Faible', 'Passable', 'Bon', 'Fort'][strengthScore.value])
 
 async function handleRegister() {
+  emailTouched.value = true
+  if (!canSubmit.value) return
   auth.error = null
   const ok = await auth.register(form)
   if (ok) router.push('/dashboard')
