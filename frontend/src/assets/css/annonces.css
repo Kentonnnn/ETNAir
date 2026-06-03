@@ -32,3 +32,6 @@ select.form-input { cursor: pointer; }
 .page-num { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: .9rem; transition: all var(--transition); }
 .page-num.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 @media (max-width: 900px) { .page-body { grid-template-columns: 1fr; } .filters { position: static; } }
+:global([data-theme="dark"]) .view-btn.active { background: #fff; color: #000; border-color: #fff; }
+:global([data-theme="dark"]) .page-num.active { background: #fff; color: #000; border-color: #fff; }
+:global([data-theme="dark"]) .page-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: #fff; }

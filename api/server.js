@@ -25,6 +25,7 @@ import authRoutes from './src/routes/auth.js';
 import userRoutes from './src/routes/utilisateurs.js';
 import listingRoutes from './src/routes/listings.js';
 import favoriteRoutes from './src/routes/favorites.js';
+import reservationRoutes from './src/routes/reservations.js';
 
 console.log('Routes imported successfully');
 
@@ -89,6 +90,9 @@ console.log('✓ /images routes registered');
 
 app.use('/favoris', favoriteRoutes);
 console.log('✓ /favoris routes registered');
+
+app.use('/reservations', reservationRoutes);
+console.log('✓ /reservations routes registered');
 
 // Health check
 app.get('/health', (req, res) => {

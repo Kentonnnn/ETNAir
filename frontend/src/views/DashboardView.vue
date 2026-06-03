@@ -51,7 +51,9 @@
               <p class="row-price"><strong>{{ formatPrice(l.pricePerNight) }} €</strong>/nuit</p>
             </div>
             <div class="row-status">
-              <span class="badge badge-success">Active</span>
+              <span :class="['badge', listingIsBooked(l.id) ? 'badge-accent' : 'badge-success']">
+                {{ listingIsBooked(l.id) ? 'Réservée' : 'Active' }}
+              </span>
             </div>
             <div class="row-actions">
               <RouterLink :to="`/annonces/${l.id}`" class="btn btn-outline btn-sm">Voir</RouterLink>
@@ -88,6 +90,72 @@
                 <RouterLink :to="`/annonces/${l.id}`" class="btn btn-outline btn-sm">Voir</RouterLink>
                 <button class="btn btn-sm" style="color:#e74c3c;border:1px solid #e74c3c" @click="removeFav(l.id)">♥ Retirer</button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Bookings tab (tenant) -->
+      <div v-if="activeTab === 'bookings'">
+        <div v-if="bookStore.loading" class="page-loader"><div class="spinner"></div></div>
+        <div v-else-if="bookStore.myBookings.length === 0" class="empty-dash">
+          <div class="empty-icon">🗓️</div>
+          <h3>Aucune réservation</h3>
+          <p>Trouvez un logement et faites votre première demande !</p>
+          <RouterLink to="/annonces" class="btn btn-primary">Explorer les logements</RouterLink>
+        </div>
+        <div v-else class="dash-listings">
+          <div class="dash-listing-row" v-for="b in bookStore.myBookings" :key="b.id">
+            <img :src="getImg(b.listing)" :alt="b.listing.title" class="row-img" />
+            <div class="row-info">
+              <h3>{{ b.listing.title }}</h3>
+              <p class="row-city">📍 {{ b.listing.city }}</p>
+              <p class="row-price">{{ formatDate(b.startDate) }} → {{ formatDate(b.endDate) }} · <strong>{{ calcNights(b.startDate, b.endDate) }} nuit(s)</strong></p>
+              <p class="row-price">Total : <strong>{{ formatPrice(b.totalPrice) }} €</strong></p>
+            </div>
+            <div class="row-status">
+              <span :class="['badge', bookingStatusClass(b.status)]">{{ bookingStatusLabel(b.status) }}</span>
+            </div>
+            <div class="row-actions">
+              <RouterLink :to="`/annonces/${b.listing.id}`" class="btn btn-outline btn-sm">Voir</RouterLink>
+              <button v-if="canCancel(b)" class="btn btn-sm" style="color:var(--danger);border:1px solid var(--danger)"
+                @click="handleCancel(b.id)" :disabled="cancellingId === b.id">
+                {{ cancellingId === b.id ? '...' : 'Annuler' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Received bookings tab (owner) -->
+      <div v-if="activeTab === 'received'">
+        <div v-if="bookStore.loading" class="page-loader"><div class="spinner"></div></div>
+        <div v-else-if="bookStore.received.length === 0" class="empty-dash">
+          <div class="empty-icon">📬</div>
+          <h3>Aucune réservation reçue</h3>
+          <p>Les demandes de vos locataires apparaîtront ici.</p>
+        </div>
+        <div v-else class="dash-listings">
+          <div class="dash-listing-row" v-for="b in bookStore.received" :key="b.id">
+            <img :src="getImg(b.listing)" :alt="b.listing.title" class="row-img" />
+            <div class="row-info">
+              <h3>{{ b.listing.title }}</h3>
+              <p class="row-city">👤 {{ b.user.firstName }} {{ b.user.lastName }} · {{ b.user.email }}</p>
+              <p class="row-price">{{ formatDate(b.startDate) }} → {{ formatDate(b.endDate) }} · <strong>{{ calcNights(b.startDate, b.endDate) }} nuit(s)</strong></p>
+              <p class="row-price">Total : <strong>{{ formatPrice(b.totalPrice) }} €</strong></p>
+            </div>
+            <div class="row-status">
+              <span :class="['badge', bookingStatusClass(b.status)]">{{ bookingStatusLabel(b.status) }}</span>
+            </div>
+            <div class="row-actions">
+              <button v-if="b.status === 'pending'" class="btn btn-primary btn-sm"
+                @click="handleConfirm(b.id)" :disabled="confirmingId === b.id">
+                {{ confirmingId === b.id ? '...' : 'Confirmer' }}
+              </button>
+              <button v-if="canCancel(b)" class="btn btn-sm" style="color:var(--danger);border:1px solid var(--danger)"
+                @click="handleCancel(b.id)" :disabled="cancellingId === b.id">
+                {{ cancellingId === b.id ? '...' : 'Refuser' }}
+              </button>
             </div>
           </div>
         </div>
@@ -141,11 +209,13 @@ import { ref, computed, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
+import { useBookingsStore } from '@/stores/bookings'
 import { listingService, userService, favoriteService } from '@/services/api'
 import { useProfilePic } from '@/stores/profilePic'
 
 const auth = useAuthStore()
 const favStore = useFavoritesStore()
+const bookStore = useBookingsStore()
 const { pic, setPic, removePic } = useProfilePic()
 
 function onPicChange(e) {
@@ -177,17 +247,21 @@ const initials = computed(() => `${auth.user?.firstName?.[0] || ''}${auth.user?.
 
 const tabs = computed(() => {
   const t = [
-    { key: 'profile', icon: '👤', label: 'Mon profil' },
-    { key: 'favorites', icon: '♥', label: 'Mes favoris' },
+    { key: 'profile',    icon: '👤', label: 'Mon profil' },
+    { key: 'favorites',  icon: '♥',  label: 'Mes favoris' },
+    { key: 'bookings',   icon: '🗓️', label: 'Mes réservations' },
   ]
-  if (auth.isOwner) t.unshift({ key: 'listings', icon: '🏠', label: 'Mes annonces' })
+  if (auth.isOwner) {
+    t.unshift({ key: 'listings', icon: '🏠', label: 'Mes annonces' })
+    t.push({ key: 'received', icon: '📬', label: 'Réservations reçues' })
+  }
   return t
 })
 
 const statCards = computed(() => [
   { icon: '🏠', label: 'Annonces', value: myListings.value.length },
-  { icon: '⭐', label: 'Avis', value: 0 },
-  { icon: '📅', label: 'Réservations', value: 0 },
+  { icon: '📅', label: 'Mes réservations', value: bookStore.myBookings.length },
+  { icon: '📬', label: 'Réservations reçues', value: bookStore.received.filter(b => b.status === 'pending').length },
 ])
 
 const FALLBACK_IMGS = [
@@ -215,7 +289,58 @@ async function deleteListing(id) {
     await listingService.remove(id)
     myListings.value = myListings.value.filter(l => l.id !== id)
     showToast?.('Annonce supprimée', 'success')
-  } catch { showToast?.('Erreur lors de la suppression', 'error') }
+  } catch (err) {
+    showToast?.(err.response?.data?.error || 'Erreur lors de la suppression', 'error')
+  }
+}
+
+const confirmingId = ref(null)
+const cancellingId = ref(null)
+
+async function handleConfirm(id) {
+  confirmingId.value = id
+  try {
+    await bookStore.confirm(id)
+    showToast?.('Réservation confirmée ✓', 'success')
+  } catch (err) {
+    showToast?.(err.response?.data?.error || 'Erreur', 'error')
+  } finally { confirmingId.value = null }
+}
+
+async function handleCancel(id) {
+  if (!confirm('Annuler cette réservation ?')) return
+  cancellingId.value = id
+  try {
+    await bookStore.cancel(id)
+    showToast?.('Réservation annulée', 'success')
+  } catch (err) {
+    showToast?.(err.response?.data?.error || 'Erreur', 'error')
+  } finally { cancellingId.value = null }
+}
+
+function listingIsBooked(listingId) {
+  const now = new Date()
+  return bookStore.received.some(b =>
+    b.listingId === listingId &&
+    b.status === 'confirmed' &&
+    new Date(b.endDate) > now
+  )
+}
+
+function bookingStatusLabel(s) {
+  return { pending: 'En attente', confirmed: 'Confirmée', cancelled: 'Annulée' }[s] ?? s
+}
+function bookingStatusClass(s) {
+  return { pending: 'badge-accent', confirmed: 'badge-success', cancelled: 'badge-danger' }[s] ?? ''
+}
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+function calcNights(s, e) { return Math.ceil((new Date(e) - new Date(s)) / 86400000) }
+function canCancel(b) {
+  if (b.status === 'cancelled') return false
+  if (!b.cancelDeadline) return true
+  return new Date() < new Date(b.cancelDeadline)
 }
 
 async function removeFav(listingId) {
@@ -231,13 +356,14 @@ function handleLogout() {
 }
 
 onMounted(async () => {
-  if (!auth.isOwner) { activeTab.value = 'profile'; loadingListings.value = false }
+  if (!auth.isOwner) { activeTab.value = 'bookings'; loadingListings.value = false }
   else {
     try {
       const { data } = await userService.getOne(auth.user.id)
       myListings.value = data.user?.listings ?? []
     } catch (e) { console.error('[dashboard] error:', e) }
     finally { loadingListings.value = false }
+    bookStore.loadReceived()
   }
 
   loadingFavs.value = true
@@ -247,6 +373,8 @@ onMounted(async () => {
     favListings.value = data.listings
   } catch {}
   finally { loadingFavs.value = false }
+
+  bookStore.loadMine()
 })
 </script>
 

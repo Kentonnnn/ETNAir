@@ -72,14 +72,15 @@ model ListingImage {
 }
 
 model Booking {
-  id         Int           @id @default(autoincrement())
-  startDate  DateTime      @map("start_date") @db.Date
-  endDate    DateTime      @map("end_date") @db.Date
-  totalPrice Decimal       @map("total_price") @db.Decimal(10, 2)
-  status     BookingStatus
-  userId     Int           @map("user_id")
-  listingId  Int           @map("listing_id")
-  createdAt  DateTime      @default(now()) @map("created_at")
+  id             Int           @id @default(autoincrement())
+  startDate      DateTime      @map("start_date") @db.Date
+  endDate        DateTime      @map("end_date") @db.Date
+  totalPrice     Decimal       @map("total_price") @db.Decimal(10, 2)
+  status         BookingStatus
+  cancelDeadline DateTime?     @map("cancel_deadline")
+  userId         Int           @map("user_id")
+  listingId      Int           @map("listing_id")
+  createdAt      DateTime      @default(now()) @map("created_at")
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)

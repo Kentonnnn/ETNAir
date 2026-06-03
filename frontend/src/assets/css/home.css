@@ -111,3 +111,5 @@
 :global([data-theme="dark"]) .hero-overlay {
   background: linear-gradient(to right, rgba(13,13,16,0.92) 40%, rgba(13,13,16,0.6));
 }
+:global([data-theme="dark"]) .step-num { background: #fff; color: #000; }
+:global([data-theme="dark"]) .reassurance-badge { background: #3f3f46; color: #fff; border: 1px solid rgba(255,255,255,0.15); }

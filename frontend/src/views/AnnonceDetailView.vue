@@ -17,7 +17,9 @@
         <div class="gallery-main">
           <img :src="mainImg" :alt="listing.title" />
           <div class="gallery-badge">
-            <span class="badge badge-success">Disponible</span>
+            <span :class="['badge', isBooked ? 'badge-accent' : 'badge-success']">
+              {{ isBooked ? 'Réservé' : 'Disponible' }}
+            </span>
           </div>
         </div>
         <div class="gallery-thumbs">
@@ -72,6 +74,17 @@
             </div>
           </div>
 
+          <!-- Booked periods -->
+          <div class="detail-section" v-if="confirmedPeriods.length > 0">
+            <h2>Dates indisponibles</h2>
+            <div class="booked-list">
+              <div class="booked-item" v-for="(p, i) in confirmedPeriods" :key="i">
+                <span class="badge badge-accent">Réservé</span>
+                <span>{{ formatDate(p.startDate) }} → {{ formatDate(p.endDate) }}</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Features (fictitious for now) -->
           <div class="detail-section">
             <h2>Équipements</h2>
@@ -114,10 +127,14 @@
                 <strong>{{ formatPrice(Number(listing.pricePerNight) * nbNights) }} €</strong>
               </div>
             </div>
-            <button class="btn btn-primary btn-lg btn-block" @click="handleReserve" :disabled="nbNights <= 0">
-              {{ nbNights > 0 ? 'Réserver' : 'Choisir des dates' }}
+            <div v-if="datesUnavailable" class="booking-unavailable">
+              ⚠️ Ces dates sont déjà réservées
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" @click="handleReserve"
+              :disabled="nbNights <= 0 || datesUnavailable || bookingLoading">
+              {{ bookingLoading ? 'Envoi...' : nbNights > 0 ? 'Demander la réservation' : 'Choisir des dates' }}
             </button>
-            <p class="booking-note">Vous ne serez pas débité maintenant</p>
+            <p class="booking-note">Le propriétaire devra confirmer votre demande</p>
           </div>
 
           <div v-else class="booking-login">
@@ -151,7 +168,7 @@
 import { ref, computed, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { listingService } from '@/services/api'
+import { listingService, bookingService } from '@/services/api'
 import ReviewSection from '@/components/ReviewSection.vue'
 
 const route = useRoute()
@@ -162,6 +179,8 @@ const showToast = inject('showToast')
 const listing = ref(null)
 const loading = ref(true)
 const booking = ref({ from: '', to: '' })
+const bookingLoading = ref(false)
+const bookedPeriods = ref([])
 const today = new Date().toISOString().split('T')[0]
 
 const IMGS = [
@@ -189,8 +208,45 @@ const nbNights = computed(() => {
 function formatPrice(p) { return Number(p).toLocaleString('fr-FR') }
 function formatDate(d) { return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) }
 
-function handleReserve() {
-  showToast?.('Fonctionnalité de réservation bientôt disponible ! 🏠', 'success')
+const now = new Date()
+const confirmedPeriods = computed(() =>
+  bookedPeriods.value.filter(p => p.status === 'confirmed' && new Date(p.endDate) > now)
+)
+const isBooked = computed(() =>
+  confirmedPeriods.value.some(p => new Date(p.startDate) <= now && new Date(p.endDate) > now)
+)
+
+const datesUnavailable = computed(() => {
+  if (!booking.value.from || !booking.value.to) return false
+  const s = new Date(booking.value.from)
+  const e = new Date(booking.value.to)
+  return bookedPeriods.value.some(p =>
+    new Date(p.startDate) < e && new Date(p.endDate) > s
+  )
+})
+
+async function handleReserve() {
+  if (nbNights.value <= 0) return
+  if (datesUnavailable.value) {
+    showToast?.('Ces dates sont déjà réservées', 'error'); return
+  }
+  bookingLoading.value = true
+  try {
+    await bookingService.create({
+      listingId: listing.value.id,
+      startDate: booking.value.from,
+      endDate: booking.value.to
+    })
+    showToast?.('Demande de réservation envoyée ! Le propriétaire va confirmer.', 'success')
+    booking.value = { from: '', to: '' }
+    // Refresh availability
+    const { data } = await bookingService.getAvailability(listing.value.id)
+    bookedPeriods.value = data.bookedDates
+  } catch (err) {
+    showToast?.(err.response?.data?.error || 'Erreur lors de la réservation', 'error')
+  } finally {
+    bookingLoading.value = false
+  }
 }
 
 async function handleDelete() {
@@ -204,8 +260,12 @@ async function handleDelete() {
 
 onMounted(async () => {
   try {
-    const { data } = await listingService.getOne(route.params.id)
-    listing.value = data.listing
+    const [listingRes, availRes] = await Promise.allSettled([
+      listingService.getOne(route.params.id),
+      bookingService.getAvailability(route.params.id)
+    ])
+    if (listingRes.status === 'fulfilled') listing.value = listingRes.value.data.listing
+    if (availRes.status === 'fulfilled')   bookedPeriods.value = availRes.value.data.bookedDates
   } catch { /* 404 */ }
   finally { loading.value = false }
 })
@@ -213,4 +273,9 @@ onMounted(async () => {
 
 <style scoped>
 @import "../assets/css/annonce-detail.css";
+.booking-unavailable { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; font-size: .9rem; margin-bottom: 12px; }
+.booked-list { display: flex; flex-direction: column; gap: 10px; }
+.booked-item { display: flex; align-items: center; gap: 12px; font-size: .9rem; color: var(--text-muted); }
+:global([data-theme="dark"]) .owner-avatar-lg { background: #fff; color: #000; }
+:global([data-theme="dark"]) .booking-unavailable { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); }
 </style>

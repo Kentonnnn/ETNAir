@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx prisma *)",
-      "PowerShell(docker exec etnaair-api-1 npx prisma migrate dev --name add-coordinates 2>&1)"
-    ]
-  }
-}
