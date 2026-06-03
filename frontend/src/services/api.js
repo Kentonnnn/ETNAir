@@ -54,4 +54,14 @@ export const favoriteService = {
   remove: (listingId) => api.delete(`/favoris/${listingId}`),
 }
 
+// ── Bookings / Réservations ───────────────────
+export const bookingService = {
+  create:          (data) => api.post('/reservations', data),
+  getMine:         ()     => api.get('/reservations/mes-reservations'),
+  getReceived:     ()     => api.get('/reservations/recues'),
+  getAvailability: (id)   => api.get(`/reservations/disponibilite/${id}`),
+  confirm:         (id)   => api.put(`/reservations/${id}/confirmer`),
+  cancel:          (id)   => api.put(`/reservations/${id}/annuler`),
+}
+
 export default api

@@ -36,6 +36,7 @@
 .profile-avatar-edit:hover .avatar-overlay { opacity: 1; }
 .avatar-actions { display: flex; gap: 8px; margin-top: 12px; }
 :global([data-theme="dark"]) .profile-avatar-edit { background: #fff; color: #000; }
+:global([data-theme="dark"]) .tab.active { background: #fff; color: #000; }
 .profile-info h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
 .profile-info p { color: var(--text-muted); font-size: .9rem; margin-bottom: 8px; }
 .profile-fields { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }

@@ -57,6 +57,7 @@ export const getAllAnnonces = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const now = new Date();
 
     const listings = await prisma.listing.findMany({
       skip,
@@ -65,12 +66,25 @@ export const getAllAnnonces = async (req, res) => {
         owner: {
           select: { id: true, firstName: true, lastName: true, email: true }
         },
-        images: true
+        images: true,
+        _count: {
+          select: {
+            bookings: {
+              where: { status: 'confirmed', endDate: { gte: now } }
+            }
+          }
+        }
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    res.json({ listings, page, limit });
+    const listingsWithStatus = listings.map(l => ({
+      ...l,
+      isBooked: l._count.bookings > 0,
+      _count: undefined
+    }));
+
+    res.json({ listings: listingsWithStatus, page, limit });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -157,22 +171,17 @@ export const deleteAnnonce = async (req, res) => {
     const { id } = req.params;
     const ownerId = req.userId;
 
-    const listing = await prisma.listing.findUnique({
-      where: { id: parseInt(id) }
+    const listing = await prisma.listing.findUnique({ where: { id: parseInt(id) } });
+    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+    if (listing.ownerId !== ownerId) return res.status(403).json({ error: 'Forbidden' });
+
+    const activeBookings = await prisma.booking.count({
+      where: { listingId: parseInt(id), status: { in: ['pending', 'confirmed'] } }
     });
+    if (activeBookings > 0)
+      return res.status(409).json({ error: 'Impossible de supprimer cette annonce : elle a des réservations actives.' });
 
-    if (!listing) {
-      return res.status(404).json({ error: 'Listing not found' });
-    }
-
-    if (listing.ownerId !== ownerId) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
-    await prisma.listing.delete({
-      where: { id: parseInt(id) }
-    });
-
+    await prisma.listing.delete({ where: { id: parseInt(id) } });
     res.json({ message: 'Listing deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

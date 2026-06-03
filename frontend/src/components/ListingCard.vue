@@ -4,7 +4,9 @@
     <div class="card-img">
       <img :src="imgUrl" :alt="listing.title" loading="lazy" @error="onImgError" />
       <div class="card-badge" v-if="listing.availableFrom">
-        <span class="badge badge-success">Disponible</span>
+        <span :class="['badge', listing.isBooked ? 'badge-accent' : 'badge-success']">
+          {{ listing.isBooked ? 'Réservé' : 'Disponible' }}
+        </span>
       </div>
       <button v-if="auth.isLoggedIn" class="fav-btn" @click.prevent="toggleFav" :class="{ active: isFav }">
         {{ isFav ? '♥' : '♡' }}
