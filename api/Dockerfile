@@ -1,7 +1,16 @@
 FROM node:24-alpine
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
-COPY . .
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+RUN npm install && apk add --no-cache netcat-openbsd
+RUN npx prisma generate
+
+COPY src ./src
+COPY server.js ./
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 EXPOSE 3000
-CMD ["node", "server.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

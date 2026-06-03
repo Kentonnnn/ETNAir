@@ -1,0 +1,68 @@
+stages:
+  - test
+  - e2e
+  - deploy
+
+test:
+  stage: test
+  image: node:24-alpine
+  only:
+    - main
+    - develop
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - api/node_modules/
+  script:
+    - cd api
+    - npm install
+    - npm test || true
+
+e2e:
+  stage: e2e
+  image: cypress/included:13.6.0
+  when: manual
+  allow_failure: true
+  only:
+    - develop
+    - main
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-frontend
+    paths:
+      - frontend/node_modules/
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npx vite &
+    - npx wait-on http://localhost:5173 --timeout 30000
+    - npx cypress run --headless
+  artifacts:
+    when: always
+    paths:
+      - frontend/cypress/screenshots/
+    expire_in: 7 days
+
+deploy:
+  stage: deploy
+  image: docker:24
+  only:
+    - main
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - apk add --no-cache curl
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x kubectl
+    - mv kubectl /usr/local/bin/
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG" > ~/.kube/config
+  script:
+    - docker build -t kentonnnn/etnair-api:latest ./api
+    - docker push kentonnnn/etnair-api:latest
+    - docker build -t kentonnnn/etnair-frontend:latest ./frontend
+    - docker push kentonnnn/etnair-frontend:latest
+    - kubectl apply -f k8s/
+  after_script:
+    - docker logout

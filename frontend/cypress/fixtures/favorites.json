@@ -1,0 +1,12 @@
+{
+  "listings": [
+    {
+      "id": 1,
+      "title": "Studio meublé Paris 11e",
+      "city": "Paris",
+      "pricePerNight": 65,
+      "images": [],
+      "owner": { "id": 10, "firstName": "Marie", "lastName": "Dupont", "email": "marie@test.com" }
+    }
+  ]
+}

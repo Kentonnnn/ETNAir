@@ -1,0 +1,142 @@
+<template>
+  <header :class="['navbar', { scrolled: isScrolled, 'menu-open': menuOpen }]">
+    <div class="container nav-inner">
+      <!-- Logo -->
+      <RouterLink to="/" class="logo">
+        <img v-if="showLogoImage" class="logo-img" src="/logo.png" alt="ETNAir logo" @error="showLogoImage = false" />
+        <template v-else>
+          <span class="logo-icon">✈</span>
+          <span class="logo-text">ETN<strong>Air</strong></span>
+        </template>
+      </RouterLink>
+
+      <!-- Desktop nav -->
+      <nav class="nav-links">
+        <RouterLink to="/annonces" class="nav-link">Nos logements</RouterLink>
+        <RouterLink to="/comment-reserver" class="nav-link">Comment réserver ?</RouterLink>
+        <RouterLink to="/qui-sommes-nous" class="nav-link">Qui sommes-nous ?</RouterLink>
+      </nav>
+
+      <!-- Theme toggle -->
+      <button class="theme-toggle" @click="theme.toggle()" :title="theme.dark ? 'Mode clair' : 'Mode sombre'">
+        <span v-if="theme.dark">☀️</span>
+        <span v-else>🌙</span>
+      </button>
+
+      <!-- CTA area -->
+      <div class="nav-cta">
+        <template v-if="auth.isLoggedIn">
+          <RouterLink to="/favoris" class="nav-link fav-link">♥ Favoris</RouterLink>
+          <RouterLink to="/dashboard" class="nav-user">
+            <div class="user-avatar">
+              <img v-if="profilePic" :src="profilePic" alt="Avatar" />
+              <span v-else>{{ initials }}</span>
+            </div>
+            <span class="user-name">{{ auth.user?.firstName }}</span>
+          </RouterLink>
+          <button class="btn btn-outline btn-sm" @click="handleLogout">Déconnexion</button>
+        </template>
+        <template v-else>
+          <RouterLink to="/login" class="nav-link nav-login">Connexion</RouterLink>
+          <RouterLink to="/register" class="btn btn-primary btn-sm">Inscription</RouterLink>
+        </template>
+      </div>
+
+      <!-- Burger -->
+      <button class="burger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <Transition name="slide-down">
+      <div v-if="menuOpen" class="mobile-menu">
+        <RouterLink to="/annonces" class="mobile-link" @click="menuOpen=false">Nos logements</RouterLink>
+        <RouterLink to="/comment-reserver" class="mobile-link" @click="menuOpen=false">Comment réserver ?</RouterLink>
+        <RouterLink to="/login" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Connexion</RouterLink>
+        <RouterLink to="/register" class="mobile-link" @click="menuOpen=false" v-if="!auth.isLoggedIn">Inscription</RouterLink>
+        <RouterLink to="/favoris" class="mobile-link" @click="menuOpen=false" v-if="auth.isLoggedIn">♥ Mes favoris</RouterLink>
+        <RouterLink to="/dashboard" class="mobile-link" @click="menuOpen=false" v-if="auth.isLoggedIn">Mon espace</RouterLink>
+        <button class="mobile-link" @click="handleLogout" v-if="auth.isLoggedIn">Déconnexion</button>
+      </div>
+    </Transition>
+  </header>
+  <!-- Spacer -->
+  <div style="height: var(--nav-h)"></div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
+import { useProfilePic } from '@/stores/profilePic'
+
+const auth = useAuthStore()
+const theme = useThemeStore()
+const { pic: profilePic } = useProfilePic()
+const router = useRouter()
+const isScrolled = ref(false)
+const menuOpen = ref(false)
+const showLogoImage = ref(true)
+
+const initials = computed(() => {
+  if (!auth.user) return ''
+  return `${auth.user.firstName?.[0] || ''}${auth.user.lastName?.[0] || ''}`.toUpperCase()
+})
+
+function handleLogout() {
+  auth.logout()
+  menuOpen.value = false
+  router.push('/')
+}
+
+function scrollTo(id) {
+  menuOpen.value = false
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 100)
+}
+
+function onScroll() { isScrolled.value = window.scrollY > 20 }
+onMounted(() => window.addEventListener('scroll', onScroll))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
+</script>
+
+<style scoped>
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: var(--nav-h); background: var(--white);
+  border-bottom: 1px solid transparent;
+  transition: all .3s ease;
+}
+.navbar.scrolled { box-shadow: var(--shadow); border-color: var(--border); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 100%; }
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+.logo-img { height: 40px; width: auto; }
+.logo-icon { font-size: 1.4rem; }
+.logo-text { font-size: 1.3rem; font-weight: 500; color: var(--text); }
+.logo-text strong { color: var(--primary); font-weight: 800; }
+.nav-links { display: flex; gap: 4px; flex: 1; }
+.nav-link { padding: 8px 14px; border-radius: 8px; font-size: .9rem; font-weight: 500; color: var(--text-muted); transition: all var(--transition); cursor: pointer; background: none; border: none; }
+.nav-link:hover, .nav-link.router-link-active { color: var(--primary); background: var(--primary-light); }
+.nav-login { color: var(--text); }
+.fav-link { color: #e74c3c !important; }
+.nav-cta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.nav-user { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; overflow: hidden; }
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.user-name { font-size: .9rem; font-weight: 600; color: var(--text); }
+.theme-toggle { background: none; border: 1.5px solid var(--border); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all .2s ease; flex-shrink: 0; }
+.theme-toggle:hover { transform: rotate(20deg) scale(1.1); border-color: var(--primary); }
+[data-theme="dark"] .theme-toggle { border-color: rgba(255,255,255,0.2); }
+.burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; margin-left: auto; }
+.burger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all .3s; }
+.mobile-menu { position: absolute; top: var(--nav-h); left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--border); padding: 12px 24px 20px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); }
+.mobile-link { padding: 12px 16px; font-size: .95rem; font-weight: 500; color: var(--text); border-radius: 8px; text-decoration: none; background: none; border: none; text-align: left; cursor: pointer; }
+.mobile-link:hover { background: var(--primary-light); color: var(--primary); }
+.slide-down-enter-active, .slide-down-leave-active { transition: all .25s ease; }
+.slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-10px); }
+@media (max-width: 768px) {
+  .nav-links, .nav-cta { display: none; }
+  .burger { display: flex; }
+}
+</style>

@@ -19,8 +19,10 @@ cd ETNAir
 ### 2. Démarrer l'environnement
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
+
+Le service API attend la base de données, exécute les migrations Prisma et lance le serveur automatiquement.
 
 ### 3. Vérifier que l'API fonctionne
 

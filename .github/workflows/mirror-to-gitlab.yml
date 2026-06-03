@@ -1,0 +1,25 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to GitLab
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GITLAB_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan rendu-git.etna-alternance.net >> ~/.ssh/known_hosts
+          git remote add gitlab git@rendu-git.etna-alternance.net:module-10351/activity-55457/group-1076314.git
+          git push gitlab HEAD:${{ github.ref_name }} --force
